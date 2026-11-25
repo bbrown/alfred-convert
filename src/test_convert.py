@@ -34,13 +34,12 @@ C = namedtuple('C', 'from_number from_unit to_number to_unit dimensionality')
 
 
 class FakeWorkflow(object):
-    """Just enough of `workflow.Workflow`, with settings and cache in memory."""
+    """Just enough of `workflow.Workflow`: settings and cache in memory."""
 
     def __init__(self, tmp_path=None):
         self.dir = tmp_path
         self.settings = {}
         self.saved = {}  # cache name -> time saved
-        self.rerun = 0
 
     def cachefile(self, name):
         return str(self.dir / name)
@@ -153,7 +152,7 @@ def test_defaults():
 
 def test_formatter():
     """Dynamic decimals work the same for negative numbers."""
-    f = convert.Formatter(2, '.', ',', True)
+    f = convert.Formatter(2, '.', ',', dynamic_decimals=True)
     assert f.formatted(-1234.5) == '-1,234.50'
     assert f.formatted(-0.004) == '-0.004'
     assert f.formatted(0.004) == '0.004'
@@ -164,7 +163,7 @@ def test_bad_currency_symbols_are_skipped(monkeypatch):
     monkeypatch.setattr(convert, 'ureg',
                         convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS))
     convert.register_exchange_rates(
-        {'STR*': 2.0, '1ST': 3.0, 'ZZZ': 'Error', 'EUR': 0.5})
+        {'STR*': 2.0, '1ST': 3.0, 'ZZZ': 0, 'EUR': 0.5})
     assert convert.ureg.Quantity(1, 'EUR').to('usd').magnitude == 2.0
 
 
@@ -174,14 +173,22 @@ def test_currency_error_names_missing_key(monkeypatch):
     monkeypatch.setattr(convert, 'show_currency_help', shown.append)
     monkeypatch.setattr(convert, 'is_running', lambda name: False)
     monkeypatch.setattr(convert, 'CRYPTO_API_KEY', None)
-    for unit in ('eth', 'btc', 'zmw'):
+    monkeypatch.setattr(convert, 'OPENX_APP_KEY', None)
+    monkeypatch.setattr(convert, 'OPENX_ONLY_CURRENCIES', {'XAU', 'XPD'})
+    for unit in ('eth', 'xau', 'xpd'):
         with pytest.raises(SystemExit):
             convert.error_if_currency(unit)
-    assert shown == ['CRYPTO_API_KEY', 'CRYPTO_API_KEY', 'APP_KEY']
+    assert shown == ['CRYPTO_API_KEY', 'APP_KEY', 'APP_KEY']
 
     convert.error_if_currency('furlong')  # not a currency
+    convert.error_if_currency('zmw')  # the free source has it: no key helps
     monkeypatch.setattr(convert, 'is_running', lambda name: True)
     convert.error_if_currency('eth')  # rates are still downloading
+    monkeypatch.setattr(convert, 'is_running', lambda name: False)
+    monkeypatch.setattr(convert, 'CRYPTO_API_KEY', 'key')
+    monkeypatch.setattr(convert, 'OPENX_APP_KEY', 'key')
+    convert.error_if_currency('eth')  # key already set
+    convert.error_if_currency('xau')
     assert len(shown) == 3
 
 
@@ -189,14 +196,14 @@ def test_rate_sources_change_clears_cache(tmp_path, monkeypatch):
     """Setting or removing an API key clears cached exchange rates."""
     wf = FakeWorkflow(tmp_path)
     monkeypatch.setattr(convert, 'CRYPTO_API_KEY', None)
-    convert.handle_update(wf)  # no record of previous sources yet
-    wf.cache_data('exchange_rates', {})
-    convert.handle_update(wf)  # unchanged
-    assert 'exchange_rates' in wf.saved
+    convert.clear_rates_if_sources_changed(wf)  # no sources recorded yet
+    wf.cache_data(convert.CURRENCY_CACHE_NAME, {})
+    convert.clear_rates_if_sources_changed(wf)  # unchanged
+    assert convert.CURRENCY_CACHE_NAME in wf.saved
 
     monkeypatch.setattr(convert, 'CRYPTO_API_KEY', 'key')
-    convert.handle_update(wf)
-    assert 'exchange_rates' not in wf.saved
+    convert.clear_rates_if_sources_changed(wf)
+    assert convert.CURRENCY_CACHE_NAME not in wf.saved
 
 
 def test_failed_update_waits_before_retrying(monkeypatch):
@@ -205,16 +212,17 @@ def test_failed_update_waits_before_retrying(monkeypatch):
     monkeypatch.setattr(convert, 'run_in_background',
                         lambda name, cmd: started.append(cmd))
     wf = FakeWorkflow()
+    attempt = convert.CURRENCY_ATTEMPT_CACHE_NAME
     convert.start_update(wf)
     convert.start_update(wf)  # first download failed: rates still stale
     assert len(started) == 1
 
-    wf.saved['rates_attempt'] -= convert.RETRY_DELAY
+    wf.saved[attempt] -= convert.CURRENCY_RETRY_DELAY
     convert.start_update(wf)
     assert len(started) == 2
 
-    wf.cache_data('exchange_rates', {})  # rates are fresh: nothing to do
-    wf.saved['rates_attempt'] -= convert.RETRY_DELAY
+    wf.cache_data(convert.CURRENCY_CACHE_NAME, {})  # rates are fresh
+    wf.saved[attempt] -= convert.CURRENCY_RETRY_DELAY
     convert.start_update(wf)
     assert len(started) == 2
 

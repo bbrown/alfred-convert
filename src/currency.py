@@ -186,8 +186,7 @@ def fetch_exchange_rates():
     Batch currencies into requests of `SYMBOLS_PER_REQUEST` currencies each.
 
     Returns:
-        list: List of `{abbr : n.nn}` dicts of exchange rates
-            (relative to EUR).
+        dict: `{symbol: rate}` mapping of exchange rates, relative to USD.
 
     """
     rates = {}
@@ -208,14 +207,14 @@ def fetch_exchange_rates():
 
     syms = []
     for s, name in CRYPTO_CURRENCIES.items():
-        # Same symbol, different currency (e.g. XPD); BTC is in both lists
-        if CURRENCIES.get(s, name) != name:
+        # Skip MTL and XPD: the fiat list uses them for Maltese lira and
+        # palladium. Keep BTC: it is Bitcoin in both lists.
+        if s in CURRENCIES and CURRENCIES[s] != name:
             log.warning('ignoring cryptocurrency "%s", as it conflicts with '
                         'a fiat currency', s)
             continue
         if s in active:
             syms.append(s)
-    # syms = [s for s in CRYPTO_CURRENCIES.keys() if s in active]
     if CRYPTO_API_KEY:
         for symbols in grouper(SYMBOLS_PER_REQUEST, syms):
             jobs.append((load_cryptocurrency_rates, (symbols,)))

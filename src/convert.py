@@ -14,7 +14,6 @@ from __future__ import print_function
 
 import os
 import sys
-import time
 
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
@@ -27,10 +26,12 @@ from config import (
     COPY_UNIT,
     CRYPTO_API_KEY,
     CRYPTO_CURRENCIES,
-    CURRENCIES,
+    CURRENCY_ATTEMPT_CACHE_NAME,
     CURRENCY_CACHE_AGE,
     CURRENCY_CACHE_NAME,
     CURRENCY_DECIMAL_PLACES,
+    CURRENCY_HELP_URL,
+    CURRENCY_RETRY_DELAY,
     CUSTOM_DEFINITIONS_FILENAME,
     DECIMAL_PLACES,
     DECIMAL_SEPARATOR,
@@ -38,16 +39,13 @@ from config import (
     DYNAMIC_DECIMALS,
     HELP_URL,
     OPENX_APP_KEY,
+    OPENX_ONLY_CURRENCIES,
     SOURCES_FILENAME,
     THOUSANDS_SEPARATOR,
 )
 from defaults import Defaults
 
 log = None
-
-# When the last exchange rate download was started
-ATTEMPT_CACHE_NAME = 'rates_attempt'
-RETRY_DELAY = 300  # seconds
 
 # Pint objects
 ureg = None
@@ -57,7 +55,7 @@ ureg = None
 def open_currency_instructions():
     """Magic action to open help in browser."""
     import webbrowser
-    webbrowser.open('https://github.com/bbrown/alfred-convert#conversions')
+    webbrowser.open(CURRENCY_HELP_URL)
     return 'Opening instructions in browser...'
 
 
@@ -67,22 +65,23 @@ def error_if_currency(unit):
         return
 
     unit = unit.upper()
-    if unit in CRYPTO_CURRENCIES and not CRYPTO_API_KEY:
-        key = 'CRYPTO_API_KEY'
-    elif unit in CURRENCIES:
-        key = 'APP_KEY'
+    # Check APP_KEY first: here XPD is palladium, not the PetroDollar coin
+    if unit in OPENX_ONLY_CURRENCIES and not OPENX_APP_KEY:
+        setting = 'APP_KEY'
+    elif unit in CRYPTO_CURRENCIES and not CRYPTO_API_KEY:
+        setting = 'CRYPTO_API_KEY'
     else:
         return
 
     log.error('[parser] unit %s is a currency without rates: set %s',
-              unit, key)
-    show_currency_help(key)
+              unit, setting)
+    show_currency_help(setting)
     sys.exit(0)
 
 
-def show_currency_help(key):
-    """Show a message in Alfred telling user to set API key ``key``."""
-    wf.add_item('Set {} to convert this currency'.format(key),
+def show_currency_help(setting):
+    """Show a message in Alfred telling user to set ``setting``."""
+    wf.add_item('Set {} to convert this currency'.format(setting),
                 'Action this item for instructions',
                 autocomplete='workflow:appkey',
                 icon=ICON_WARNING)
@@ -90,7 +89,7 @@ def show_currency_help(key):
     wf.send_feedback()
 
 
-def handle_update(wf):
+def clear_rates_if_sources_changed(wf):
     """Clear cached exchange rates if the configured rate sources changed.
 
     E.g. the user has just set or removed ``APP_KEY`` or ``CRYPTO_API_KEY``,
@@ -106,7 +105,8 @@ def handle_update(wf):
                 return
 
     wf.cache_data(CURRENCY_CACHE_NAME, None)
-    wf.cache_data(ATTEMPT_CACHE_NAME, None)  # fetch now, don't wait to retry
+    # Fetch now, don't wait to retry
+    wf.cache_data(CURRENCY_ATTEMPT_CACHE_NAME, None)
     with open(path, 'w') as fp:
         fp.write(sources)
     log.debug('cleared cached exchange rates: sources are now %s', sources)
@@ -116,17 +116,17 @@ def start_update(wf):
     """Fetch exchange rates in the background if they're out of date.
 
     A failed download (e.g. offline) leaves the rates out of date, so
-    only try again after ``RETRY_DELAY`` seconds.
+    only try again after ``CURRENCY_RETRY_DELAY`` seconds.
 
     """
     if (wf.cached_data_fresh(CURRENCY_CACHE_NAME, CURRENCY_CACHE_AGE) or
-            wf.cached_data_fresh(ATTEMPT_CACHE_NAME, RETRY_DELAY)):
+            wf.cached_data_fresh(CURRENCY_ATTEMPT_CACHE_NAME,
+                                 CURRENCY_RETRY_DELAY)):
         return
 
-    wf.cache_data(ATTEMPT_CACHE_NAME, time.time())
+    wf.cache_data(CURRENCY_ATTEMPT_CACHE_NAME, True)
     run_in_background('update', [sys.executable,
                                  wf.workflowfile('currency.py')])
-    wf.rerun = 0.5
 
 
 class NoToUnits(Exception):
@@ -399,7 +399,8 @@ class Converter(object):
 
         # Create `Input` from parsed query
         tu = None
-        if to_unit is not None:  # Pint can't bool() temperatures
+        # Pint raises on bool() of offset units (degC, degF)
+        if to_unit is not None:
             tu = str(to_unit.units)
         i = Input(from_unit.magnitude, str(from_unit.dimensionality),
                   str(from_unit.units), tu, ctx)
@@ -543,7 +544,9 @@ def register_exchange_rates(exchange_rates):
     ureg.define('USD = [currency] = usd')
 
     for abbr, rate in exchange_rates.items():
-        if not abbr.isidentifier():  # Pint unit names, e.g. not "STR*"
+        # Old caches may hold names like "STR*". Pint raises AssertionError
+        # on these, not the UndefinedUnitError caught below.
+        if not abbr.isidentifier():
             log.warning('skipping currency %r : not a valid unit name', abbr)
             continue
 
@@ -668,7 +671,7 @@ def main(wf):
     query = wf.args[0]  # .lower()
     log.debug('query : %s', query)
 
-    handle_update(wf)
+    clear_rates_if_sources_changed(wf)
     # Create data files if necessary
     bootstrap(wf)
 

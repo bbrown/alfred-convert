@@ -37,9 +37,16 @@ CRYPTO_API_KEY = os.getenv('CRYPTO_API_KEY') or None
 CURRENCY_CACHE_AGE = int(os.getenv('UPDATE_INTERVAL') or '360') * 60
 
 CURRENCY_CACHE_NAME = 'exchange_rates'
+CURRENCY_ATTEMPT_CACHE_NAME = 'rates_attempt'
+CURRENCY_RETRY_DELAY = 300  # seconds
 REFERENCE_CURRENCY = 'USD'
 OPENX_API_URL = 'https://openexchangerates.org/api/latest.json?app_id={}'
 XRA_API_URL = 'https://api.exchangerate-api.com/v4/latest/{}'
+# Fiat currencies only openexchangerates.org offers, so they need APP_KEY.
+# shortcut: a fixed list, so currencies/currencies_docs.py checks it; build
+# it from downloaded rates instead if it goes stale often.
+OPENX_ONLY_CURRENCIES = {
+    'BTC', 'CUC', 'KPW', 'SVC', 'VEF', 'XAG', 'XAU', 'XPD', 'XPT'}
 CRYPTO_COMPARE_BASE_URL = (
     'https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}')
 SYMBOLS_PER_REQUEST = 20
@@ -191,7 +198,8 @@ CURRENCIES = {
     u'SEK': u'Swedish Krona',
     u'SGD': u'Singapore Dollar',
     u'SHP': u'Saint Helena Pound',
-    u'SLL': u'Sierra Leonean Leone',
+    u'SLE': u'Sierra Leonean Leone',
+    u'SLL': u'Sierra Leonean Leone (Old)',
     u'SOS': u'Somali Shilling',
     u'SRD': u'Surinamese Dollar',
     u'SSP': u'South Sudanese Pound',
@@ -214,6 +222,7 @@ CURRENCIES = {
     u'UYU': u'Uruguayan Peso',
     u'UZS': u'Uzbekistan Som',
     u'VEF': u'Venezuelan Bolívar Fuerte',
+    u'VES': u'Venezuelan Bolívar Soberano',
     u'VND': u'Vietnamese Dong',
     u'VUV': u'Vanuatu Vatu',
     u'WST': u'Samoan Tala',
@@ -221,6 +230,7 @@ CURRENCIES = {
     u'XAG': u'Silver (troy ounce)',
     u'XAU': u'Gold (troy ounce)',
     u'XCD': u'East Caribbean Dollar',
+    u'XCG': u'Caribbean Guilder',
     u'XDR': u'Special Drawing Rights',
     u'XOF': u'CFA Franc BCEAO',
     u'XPD': u'Palladium Ounce',
@@ -229,6 +239,8 @@ CURRENCIES = {
     u'YER': u'Yemeni Rial',
     u'ZAR': u'South African Rand',
     u'ZMW': u'Zambian Kwacha',
+    u'ZWG': u'Zimbabwean ZiG',
+    u'ZWL': u'Zimbabwean Dollar',
 }
 
 CRYPTO_CURRENCIES = {
@@ -331,7 +343,6 @@ CRYPTO_CURRENCIES = {
     u'AXIOM': u'Axiom Coin',
     u'AXR': u'AXRON',
     u'B3': u'B3 Coin',
-    u'B@': u'BankCoin',
     u'BAC': u'BitalphaCoin',
     u'BAN': u'Babes and Nerds',
     u'BAR': u'TBIS token',
@@ -354,7 +365,6 @@ CRYPTO_CURRENCIES = {
     u'BERN': u'BERNcash',
     u'BEST': u'BestChain',
     u'BET': u'BetaCoin',
-    u'BET*': u'DAO.casino',
     u'BFX': u'BitFinex Tokens',
     u'BHC': u'BighanCoin',
     u'BIC': u'Bikercoins',
@@ -1440,7 +1450,6 @@ CRYPTO_CURRENCIES = {
     u'STHR': u'Stakerush',
     u'STO': u'Save The Ocean',
     u'STORJ': u'Storj',
-    u'STR*': u'StarCoin',
     u'STRAT': u'Stratis',
     u'STS': u'STRESScoin',
     u'STU': u'BitJob',
@@ -1493,7 +1502,6 @@ CRYPTO_CURRENCIES = {
     u'TIT': u'TitCoin',
     u'TIX': u'Blocktix',
     u'TKN': u'TokenCard  ',
-    u'TKN*': u'TrollTokens',
     u'TKR': u'CryptoInsight',
     u'TKS': u'Tokes',
     u'TMC': u'TimesCoin',
@@ -1744,6 +1752,7 @@ CRYPTO_CURRENCIES = {
 # ----------------------------------------------------------------------
 HELP_URL = 'https://github.com/bbrown/alfred-convert/issues'
 README_URL = 'https://github.com/bbrown/alfred-convert#alfred-convert'
+CURRENCY_HELP_URL = 'https://github.com/bbrown/alfred-convert#api-keys'
 
 # ----------------------------------------------------------------------
 # Icons

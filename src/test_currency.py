@@ -7,7 +7,10 @@
 """Test exchange rate fetching."""
 
 import logging
+import os
+import re
 
+import config
 import currency
 
 currency.log = logging.getLogger('currency')
@@ -59,3 +62,21 @@ def test_crypto_rates_are_optional(monkeypatch):
 
     crypto = IOError('HTTP Error 401: Unauthorized')  # e.g. a bad key
     assert currency.fetch_exchange_rates() == {'EUR': 0.9}
+
+
+def test_currency_symbols_are_unit_names():
+    """Pint can't use symbols such as "STR*" as unit names."""
+    symbols = list(currency.CURRENCIES) + list(currency.CRYPTO_CURRENCIES)
+    assert [s for s in symbols if not s.isidentifier()] == []
+
+
+def test_currency_docs_match_config():
+    """docs/currencies.md matches config.py: rerun currencies_docs.py."""
+    path = os.path.join(os.path.dirname(__file__), '..', 'docs',
+                        'currencies.md')
+    with open(path, encoding='utf-8') as fp:
+        rows = re.findall(r'^\| (\w+) +\| (.*?) +\|$', fp.read(), re.M)
+    assert {s for s, _ in rows} - {'Symbol'} == (
+        set(config.CURRENCIES) | set(config.CRYPTO_CURRENCIES))
+    assert {s for s, name in rows if name.endswith('\\*')} == (
+        config.OPENX_ONLY_CURRENCIES)

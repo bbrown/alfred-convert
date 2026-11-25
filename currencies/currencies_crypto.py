@@ -65,7 +65,8 @@ def main():
     valid = []
     invalid = set()
     for k, d in data['Data'].items():
-        all_currencies.append(Currency(k, d['CoinName']))
+        if k.isidentifier():  # Pint can't use e.g. "STR*" as a unit name
+            all_currencies.append(Currency(k, d['CoinName']))
 
     print('%d total currencies' % len(all_currencies))
 

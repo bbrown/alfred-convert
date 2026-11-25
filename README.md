@@ -2,250 +2,169 @@
 Alfred-Convert
 ==============
 
-Convert between different units offline in [Alfred 4+][alfred].
+Convert between units in [Alfred][alfred], with or without an Internet connection. Alfred-Convert uses the [Pint][pintdocs] library, which knows hundreds of units. The workflow adds a few more, and you can add your own. Currency conversions need an Internet connection now and then to update exchange rates.
 
 ![][demo]
 
-Alfred-Convert uses a [built-in library][pintdocs] for lightning-fast conversions.
-
-You can also add your own custom units.
-
-**Note:** Currency conversions do require occasional Internet connectivity to update exchange rates. Alfred-Convert will otherwise work just fine without an Internet connection.
-
-<!-- MarkdownTOC autolink="true" bracket="round" depth="2" autoanchor="true" -->
-
-- [Downloading](#downloading)
+- [Installation](#installation)
 - [Usage](#usage)
-  - [Conversions](#conversions)
-  - [Configuration](#configuration)
-    - [Configuration sheet](#configuration-sheet)
-    - [Active currencies](#active-currencies)
-    - [Custom units](#custom-units)
-- [Supported units](#supported-units)
-  - [Supported currencies](#supported-currencies)
-  - [Adding custom units](#adding-custom-units)
+- [Currencies](#currencies)
+  - [API keys](#api-keys)
+  - [Active currencies](#active-currencies)
+  - [Exchange rate updates](#exchange-rate-updates)
+- [Configuration](#configuration)
+- [Custom units](#custom-units)
 - [Releases](#releases)
 - [Thanks, copyright, licensing](#thanks-copyright-licensing)
 
-<!-- /MarkdownTOC -->
+
+Installation
+------------
+
+Download the workflow from [GitHub releases][ghreleases], then double-click the file to install it in Alfred.
+
+Version 3.8 and later needs Python 3 (`/usr/bin/python3`) and works on macOS 12.3 or later with Alfred 5 or 6. If Python 3 isn't installed, macOS offers to install it (with the Xcode Command Line Tools) the first time you use the workflow.
+
+If you still use Alfred 3, download [v3.6.2][v3.6.2] instead.
 
 
-<a name="downloading"></a>
-Downloading
------------
-
-Download from [GitHub releases][ghreleases].
-
-**Note**: Version 3.7 and above only supports Alfred 4+. If you're still using Alfred 3, please download [v3.6.2][v3.6.2].
-
-**Note**: Version 3.8 and above requires Python 3 (`/usr/bin/python3`). If it isn't installed, macOS offers to install it (with the Xcode Command Line Tools) the first time it's run.
-
-
-<a name="usage"></a>
 Usage
 -----
 
-- `conv <quantity> <from unit> [<to unit>]` — Perform a conversion
-    - `↩` — Copy result without thousands separator to pasteboard
-    - `⌘C` — Copy result with thousands separator to pasteboard
-    - `⌘↩` — Add/remove destination unit as default for this dimensionality
-    - `⌘L` — Show result in Alfred's Large Type window
-- `convinfo` — View help file and information about the workflow, or edit custom units and active currencies
-    - `View Help File` — Open this page in your browser
-    - `View All Supported Currencies` — View/filter the list of all supported currencies in Alfred
-    - `Edit Active Currencies` — Edit the list of active currencies in your default text editor
-    - `Edit Custom Units` — Edit the list of custom currencies in your default text editor
-
-
-<a name="conversions"></a>
-### Conversions ###
-
-**NOTE**: Only a limited number of fiat currencies are supported by default. Additional rates are only supported if you set a key for the [openexchangerates.org][openx] API in the workflow's [configuration sheet](#configuration). You can sign up for a free account [here][openx-free]. When you're signed up, copy the **App ID** from the email you receive or [this page][openx-appid] into the `APP_KEY` field in the [configuration sheet](#configuration).
-
-**NOTE**: Cryptocurrency conversions require a (free) [CryptoCompare][cryptocompare] API key, which you can get from [CoinDesk][coindesk-key]. Enter it in the `CRYPTO_API_KEY` field in the [configuration sheet](#configuration). The key is optional: without it, everything else works as normal, but cryptocurrency exchange rates aren't downloaded, so cryptocurrencies can't be converted.
-
-- `conv [<context>] <quantity> <from unit> [<to unit>]` — Perform a conversion
-    - `↩` or `⌘C` — Copy the result to the pasteboard
-    - `⌘↩` — Add/remove destination unit as default for this dimensionality
-    - `⌘L` — Show result in Alfred's Large Type window
-
-If no destination unit is specified, any defaults you've saved will be used (that aren't the same as the source unit).
-
-The syntax is simple: an optional context, the quantity, the unit you want to convert from then (optionally) the unit you want to convert to. For example:
+Type `conv`, a number and a unit. To convert to a particular unit, add it at the end:
 
 - `conv 128 mph kph`
-- `conv 72in cm`
+- `conv 72in cm` (the space after the number is optional)
 - `conv 100psi bar`
 - `conv 20.5 m/s mph`
 - `conv 100 eur gbp`
 
-Or with a context:
+If you leave out the unit to convert to, the workflow uses your default units for that dimensionality, such as length or mass. To save a default, select a result and press `⌘↩`.
 
-- `conv spectroscopy 1Å eV` (or `conv sp 1Å eV`)
+Some conversions only work in a [Pint context][pintcontexts]. Put the context's name or short name first: `conv spectroscopy 1Å eV` or `conv sp 1Å eV`.
 
-It doesn't matter if there is a space between the quantity and the units or not. Alfred-Convert will tell you if it doesn't understand your query or know the units.
+If the workflow doesn't understand your query or doesn't know a unit, it says so.
 
-Actioning an item (selecting it and hitting `↩`) will copy it to the clipboard. Using `⌘+L` will display the result in Alfred's large text window, `⌘+C` will copy the selected result to the clipboard.
+When you select a result:
 
+| Key  | Action                                                           |
+|------|------------------------------------------------------------------|
+| `↩`  | Copy the result without thousands separators                     |
+| `⌘C` | Copy the result with thousands separators                        |
+| `⌘↩` | Save the unit as a default for this dimensionality, or remove it |
+| `⌘L` | Show the result in Large Type                                    |
 
-<a name="configuration"></a>
-### Configuration ###
+Copied results leave out the unit unless you turn on `COPY_UNIT` in the [configuration sheet](#configuration).
 
-The workflow is configured via the [configuration sheet][config-sheet] (the `[𝒙]` icon) in Alfred Preferences and via a couple of text files in its data directory.
+Type `convinfo` for help and the workflow's files:
 
-
-#### Configuration sheet ####
-
-Basic configuration is performed in the [configuration sheet][config-sheet]:
-
-|           Option          |                                                                    Meaning                                                                    |
-|---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| `APP_KEY`                 | API key for [openexchangerates.org][openx].                                                                                                   |
-| `COPY_UNIT`               | Include unit when copying conversion result. Any value but `0` or empty turns this option on.                                                 |
-| `CRYPTO_API_KEY`          | API key for [CryptoCompare][cryptocompare] (free from [CoinDesk][coindesk-key]). Optional: cryptocurrencies are only converted if it is set.  |
-| `CURRENCY_DECIMAL_PLACES` | Overrides the default `DECIMAL_PLACES` setting for currency conversions.                                                                      |
-| `DECIMAL_PLACES`          | Number of decimal places to show in results.                                                                                                  |
-| `DECIMAL_SEPARATOR`       | Character to separate whole numbers and decimal fractions. Used for parsing input and generating output.                                      |
-| `DYNAMIC_DECIMALS`        | Dynamically increase the number of decimal places (up to 10) so that the result is non-zero. Any value but `0` or empty turns this option on. |
-| `THOUSANDS_SEPARATOR`     | Character to delimit thousands Used for parsing input and generating output.                                                                  |
-| `UPDATE_INTERVAL`         | How often (in minutes) to update currency exchange rates.                                                                                     |
+- **View Help File** opens this page.
+- **View All Supported Currencies** lets you search the currency list.
+- **Edit Active Currencies** opens your list of [active currencies](#active-currencies).
+- **Edit Custom Units** opens your [custom units](#custom-units) file.
 
 
-#### Active currencies ####
+Currencies
+----------
 
-By default, all supported fiat currencies (provided you've set `APP_KEY` in the [configuration sheet](#configuration)) and a handful of the most popular cryptocurrencies (provided you've set `CRYPTO_API_KEY`) are active.
+Use a currency's symbol, e.g. `conv 100 eur gbp`. See the [list of supported currencies](./docs/currencies.md), or search it in Alfred with `convinfo` → **View All Supported Currencies**.
 
-- `convinfo`
-    - `View All Supported Currencies`
-    - `Edit Active Currencies`
+Exchange rates come from:
 
-Use `Edit Active Currencies` to open the list of active currencies in your default editor. Add the symbol for the currency you'd like to activate on a new line in this file.
-
-You can use `View All Supported Currencies` to search for the currency you'd like to activate, then use `⌘C` on the result to copy the symbol to the pasteboard.
-
-
-#### Custom units ####
-
-See [Adding custom units](#adding-custom-units).
+- **[ExchangeRate-API.com][xapi]**: most fiat currencies, with no API key.
+- **[openexchangerates.org][openx]**: fiat currencies, including the few ExchangeRate-API.com doesn't offer, if you set `APP_KEY`. It replaces ExchangeRate-API.com.
+- **[CryptoCompare][cryptocompare]**: cryptocurrencies, if you set `CRYPTO_API_KEY`.
 
 
-<a name="supported-units"></a>
-Supported units
----------------
+### API keys ###
 
-Currently, Alfred-Convert only supports [the units][pintunits] understood by the underlying [Pint][pintdocs] library plus [currencies](#supported-currencies) and a handful of additional units.
+Both keys are free. Set them in the [configuration sheet](#configuration):
 
-You can [add your own custom units](#adding-custom-units) to the workflow. If you think they'd be useful to everyone, please create a corresponding [GitHub issue][ghissues] to request addition as a default unit or submit a [pull request][ghpulls].
+- **`APP_KEY`**: [sign up for a free openexchangerates.org account][openx-free], then copy your **App ID** from the sign-up email or [your account page][openx-appid].
+- **`CRYPTO_API_KEY`**: get a free CryptoCompare API key from [CoinDesk][coindesk-key].
 
-
-<a name="supported-currencies"></a>
-### Supported currencies ###
-
-To convert, use the appropriate **abbreviation** for the relevant currencies, e.g. `conv 100 eur gbp`.
-
-You can also view (and search) the list from within Alfred by using the keyword `convinfo` and choosing `View All Supported Currencies`.
-
-[All supported currencies](./docs/currencies.md).
+If a currency has no exchange rate, the workflow tells you which API key adds it. A currency also needs to be in your [active currencies](#active-currencies).
 
 
-<a name="adding-custom-units"></a>
-### Adding custom units ###
+### Active currencies ###
 
-You can add your own custom units using the [format defined by Pint][pinthowto]. Add your definitions to the `unit_definitions.txt` file in the workflow's data directory.
+The workflow downloads exchange rates only for active currencies. By default, these are all supported fiat currencies and a handful of popular cryptocurrencies, such as BTC and ETH.
 
-To edit this file, enter `convinfo` in Alfred and select `Edit Custom Units`. The `unit_definitions.txt` file will open in your default text editor.
-
-Please see the [Pint documentation][pinthowto] for the required format. See Pint's [default unit definitions][pintunits] for examples.
+To change the list, use `convinfo` → **Edit Active Currencies**, and put one currency symbol on each line. To find a symbol, use `convinfo` → **View All Supported Currencies**, select the currency and press `⌘C` to copy its symbol.
 
 
-<a name="releases"></a>
+### Exchange rate updates ###
+
+The workflow updates exchange rates in the background every 6 hours. To change how often, set `UPDATE_INTERVAL` (in minutes). While an update runs, Alfred shows "Updating exchange rates…" above the results.
+
+If an update fails, e.g. because you're offline, the workflow keeps using the rates it already has and tries again after 5 minutes. When you set or remove an API key, the workflow deletes its saved rates and downloads new ones.
+
+
+Configuration
+-------------
+
+Set these variables in the workflow's [configuration sheet][config-sheet] (the `[𝒙]` button in Alfred Preferences):
+
+| Variable                  | Meaning                                                                                                 | Default |
+|---------------------------|---------------------------------------------------------------------------------------------------------|---------|
+| `APP_KEY`                 | API key for openexchangerates.org. See [API keys](#api-keys).                                           | None    |
+| `COPY_UNIT`               | Include the unit when copying a result. Any value except `0` or empty turns this on.                    | Off     |
+| `CRYPTO_API_KEY`          | API key for CryptoCompare. See [API keys](#api-keys).                                                   | None    |
+| `CURRENCY_DECIMAL_PLACES` | Decimal places in currency results. If empty, `DECIMAL_PLACES` is used.                                 | `2`     |
+| `DECIMAL_PLACES`          | Decimal places in results.                                                                              | `2`     |
+| `DECIMAL_SEPARATOR`       | Character between whole numbers and decimal fractions, in queries and results.                          | `.`     |
+| `DYNAMIC_DECIMALS`        | Add decimal places (up to 10) until the result isn't zero. Any value except `0` or empty turns this on. | On      |
+| `THOUSANDS_SEPARATOR`     | Character between groups of thousands, in queries and results.                                          | `,`     |
+| `UPDATE_INTERVAL`         | Minutes between exchange rate updates.                                                                  | `360`   |
+
+
+Custom units
+------------
+
+Add your own units to `unit_definitions.txt` in the workflow's data folder. To open it, use `convinfo` → **Edit Custom Units**. Define each unit in [Pint's format][pinthowto]. Pint's [default definitions][pintunits] have many examples.
+
+If you think a unit would be useful to everyone, please [open an issue][ghissues] or send a [pull request][ghpulls].
+
+
 Releases
 --------
 
-See [CHANGELOG][changelog] for more information.
-
-|     Release     |      Date      |
-|-----------------|----------------|
-| [3.7.0][v3.7.0] | 2020-02-20     |
-| [3.6.2][v3.6.2] | 2019-09-06     |
-| [3.6.1][v3.6.1] | 2019-05-30     |
-| [3.6.0][v3.6.0] | 2019-05-06     |
-| [3.5.3][v3.5.3] | 2019-01-26     |
-| [3.5.2][v3.5.2] | 2019-01-26     |
-| [3.5.1][v3.5.1] | 2018-01-13     |
-| [3.5][v3.5]     | 2018-01-12     |
-| [3.4][v3.4]     | 2017-12-26     |
-| [3.3.1][v3.3.1] | 2017-11-21     |
-| [3.3][v3.3]     | 2017-11-20     |
-| [3.2.2][v3.2.2] | 2017-11-07     |
-| [3.2.1][v3.2.1] | 2017-11-04     |
-| [3.2][v3.2]     | 2017-11-02     |
-| [3.1][v3.1]     | 2017-11-02     |
-| [3.0][v3.0]     | 2017-07-16     |
-| [2.6][v2.6]     | 2017-06-15     |
-| [2.5][v2.5]     | 2015-12-11     |
-| [2.4][v2.4]     | 2015-11-28     |
-| [2.3][v2.3]     | 2015-11-26     |
-| [2.2][v2.2]     | 2015-07-16     |
-| 2.1             | Never released |
-| [2.0][v2.0]     | 2014-12-26     |
-| [1.2][v1.2]     | 2014-08-19     |
-| [1.1][v1.1]     | 2014-08-09     |
+See the [changelog][changelog] for what changed in each version. From version 3.8, releases are on [this repository's releases page][ghreleases]. Earlier releases are on the [original repository's releases page][upstream-releases].
 
 
-<a name="thanks-copyright-licensing"></a>
 Thanks, copyright, licensing
 ----------------------------
 
-- The Python [Pint][pintdocs] library does all the heavy lifting. See the [Pint GitHub repo][pintrepo] for Pint licensing or `LICENSE.txt` and `AUTHORS.txt` in the `pint` subdirectory.
-- The workflow icons are from [Font Awesome][fontawesome]
-- Exchange rates are downloaded from [openexchangerates.org][openx] and [CryptoCompare][cryptocompare] (for cryptocurrencies).
-- The [Alfred-Workflow][alfred-workflow] library is used heavily.
+- This is a fork of [deanishe/alfred-convert][upstream] by Dean Jackson.
+- The [Pint][pintdocs] library does the unit conversions. See the [Pint repository][pintrepo] for its licence.
+- Exchange rates come from [ExchangeRate-API.com][xapi], [openexchangerates.org][openx] and [CryptoCompare][cryptocompare].
+- The workflow uses the [Alfred-PyWorkflow][alfred-pyworkflow] library.
+- The icons are from [Font Awesome][fontawesome].
 
-All other code/media are released under the [MIT Licence][mit].
+All other code and media are released under the [MIT Licence][mit].
 
 
-[alfred-workflow]: http://www.deanishe.net/alfred-workflow/
-[alfred]: http://www.alfredapp.com/
+[alfred]: https://www.alfredapp.com/
+[alfred-pyworkflow]: https://xdevcloud.de/alfred-pyworkflow/
 [changelog]: ./CHANGELOG.md
-[demo]: https://raw.github.com/deanishe/alfred-convert/master/demo.gif
-[fontawesome]: http://fortawesome.github.io/Font-Awesome/
+[coindesk-key]: https://developers.coindesk.com/
+[config-sheet]: https://www.alfredapp.com/help/workflows/advanced/variables/#environment
+[cryptocompare]: https://www.cryptocompare.com/
+[demo]: ./demo.gif
+[fontawesome]: https://fontawesome.com/
 [ghissues]: https://github.com/bbrown/alfred-convert/issues
 [ghpulls]: https://github.com/bbrown/alfred-convert/pulls
 [ghreleases]: https://github.com/bbrown/alfred-convert/releases
-[mit]: http://opensource.org/licenses/MIT
-[pintdocs]: http://pint.readthedocs.org/en/latest/index.html
-[pinthowto]: http://pint.readthedocs.org/en/latest/defining.html
+[mit]: https://opensource.org/licenses/MIT
+[openx]: https://openexchangerates.org/
+[openx-appid]: https://openexchangerates.org/account/app-ids
+[openx-free]: https://openexchangerates.org/signup/free
+[pintcontexts]: https://pint.readthedocs.io/en/stable/user/contexts.html
+[pintdocs]: https://pint.readthedocs.io/
+[pinthowto]: https://pint.readthedocs.io/en/stable/advanced/defining.html
 [pintrepo]: https://github.com/hgrecco/pint
 [pintunits]: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
-[v1.1]: https://github.com/deanishe/alfred-convert/releases/tag/v1.1
-[v1.2]: https://github.com/deanishe/alfred-convert/releases/tag/v1.2
-[v2.0]: https://github.com/deanishe/alfred-convert/releases/tag/v2.0
-[v2.2.1]: https://github.com/deanishe/alfred-convert/releases/tag/v2.2.1
-[v2.2]: https://github.com/deanishe/alfred-convert/releases/tag/v2.2
-[v2.3]: https://github.com/deanishe/alfred-convert/releases/tag/v2.3
-[v2.4]: https://github.com/deanishe/alfred-convert/releases/tag/v2.4
-[v2.5]: https://github.com/deanishe/alfred-convert/releases/tag/v2.5
-[v2.6]: https://github.com/deanishe/alfred-convert/releases/tag/v2.6
-[v3.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.0
-[v3.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.1
-[v3.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.2
-[v3.2.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.2.1
-[v3.2.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.2.2
-[v3.3]: https://github.com/deanishe/alfred-convert/releases/tag/v3.3
-[v3.3.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.3.1
-[v3.4]: https://github.com/deanishe/alfred-convert/releases/tag/v3.4
-[v3.5]: https://github.com/deanishe/alfred-convert/releases/tag/v3.5
-[v3.5.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.5.1
-[v3.5.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.5.2
-[v3.5.3]: https://github.com/deanishe/alfred-convert/releases/tag/v3.5.3
-[v3.6.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.0
-[v3.6.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.1
+[upstream]: https://github.com/deanishe/alfred-convert
+[upstream-releases]: https://github.com/deanishe/alfred-convert/releases
 [v3.6.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.2
-[v3.7.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.7.0
-[cryptocompare]: https://www.cryptocompare.com/
-[coindesk-key]: https://developers.coindesk.com/
-[openx]: https://openexchangerates.org/
-[openx-free]: https://openexchangerates.org/signup/free
-[openx-appid]: https://openexchangerates.org/account/app-ids
-[config-sheet]: https://www.alfredapp.com/help/workflows/advanced/variables/#environment
+[xapi]: https://www.exchangerate-api.com/

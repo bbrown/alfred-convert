@@ -12,8 +12,10 @@ Lists of currencies and scripts to generate them.
 | `currencies_custom.tsv`       | Unofficial currencies                                          |
 | `currencies_openexchange.tsv` | Exchange rates offered by [openexchangerates.org][openx]  |
 | `currencies_openexchange.py`  | Script to generate above list                             |
+| `currencies_docs.py`          | Script to generate [`docs/currencies.md`][docs]           |
 | `ISO 4217 List One.xlsx`      | Source list from the [ISO][iso4217]                       |
 
+[docs]: ../docs/currencies.md
 [iso4217]: https://www.iso.org/iso-4217-currency-codes.html
 [openx]: https://openexchangerates.org/
 [crypto]: https://www.cryptocompare.com/

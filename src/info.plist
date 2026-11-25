@@ -507,13 +507,12 @@ You can also add your own custom units.
 Configuration
 -------------
 
-APP_KEY is your API key for OpenExchangeRates.org. This is required
-to download exchange rates for fiat currencies.
+APP_KEY is your API key for OpenExchangeRates.org (free at https://openexchangerates.org/signup/free). Optional: without it, exchange rates for most fiat currencies come from ExchangeRate-API.com.
 
 CRYPTO_API_KEY is your API key for CryptoCompare.com (free at https://developers.coindesk.com/). Optional: cryptocurrency exchange rates are only downloaded if it is set.
 
 
-COPY_UNIT determines whether the unit is also copied when you press CMD+C. 0 or no value means the unit won't be copied. Any other value means the unit will also be copied.
+COPY_UNIT determines whether the unit is also copied when you copy a result. 0 or no value means the unit won't be copied. Any other value means the unit will also be copied.
 
 CURRENCY_DECIMAL_PLACES overrides DECIMAL_PLACES (see below) for currency conversion.
 

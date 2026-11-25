@@ -1,20 +1,3 @@
-007	007 coin
-1337	1337
-1CR	1Credit
-1ST	FirstBlood
-2015	2015 coin
-2BACCO	2BACCO Coin
-2GIVE	2GiveCoin
-32BIT	32Bitcoin
-365	365Coin
-404	404Coin
-42	42 Coin
-4CHN	ChanCoin
-611	SixEleven
-808	808
-888	Octocoin
-8BIT	8BIT Coin
-8BT	8 Circuit Studios
 ABC	AB-Chain
 ABY	ArtByte
 AC	Asia Coin
@@ -42,7 +25,6 @@ AGS	Aegis
 AHT	Ahoolee
 AIB	AdvancedInternetBlock
 AIR	AirToken
-AIR*	Aircoin
 ALC	Arab League Coin
 ALEX	Alexandrite
 ALF	AlphaCoin
@@ -66,7 +48,6 @@ APEX	ApexCoin
 APT	Aptcoin
 APX	Apx
 ARB	Arbit Coin
-ARC*	ArcticCoin
 ARCH	ArchCoin
 ARCO	AquariusCoin
 ARDR	Ardor
@@ -80,7 +61,6 @@ ARPA	ArpaCoin
 ASAFE	Allsafe
 ASN	Ascension Coin
 AST	AirSwap
-AST*	Astral
 ATB	ATB coin
 ATCC	ATC Coin
 ATL	ATLANT
@@ -96,7 +76,6 @@ AVT	AventCoin
 AXIOM	Axiom Coin
 AXR	AXRON
 B3	B3 Coin
-B@	BankCoin
 BAC	BitalphaCoin
 BAN	Babes and Nerds
 BAR	TBIS token
@@ -119,7 +98,6 @@ BENJI	BenjiRolls
 BERN	BERNcash
 BEST	BestChain
 BET	BetaCoin
-BET*	DAO.casino
 BFX	BitFinex Tokens
 BHC	BighanCoin
 BIC	Bikercoins
@@ -148,7 +126,6 @@ BLX	Blockchain Index
 BM	BitMoon
 BMC	Blackmoon Crypto
 BNB	Binance Coin
-BNB*	Boats and Bitches
 BNC	Benjacoin
 BNT	Bancor Network Token
 BNX	BnrtxCoin
@@ -190,17 +167,14 @@ BTCS	Bitcoin Scrypt
 BTD	Bitcloud
 BTE	ByteCoin
 BTG	Bitcoin Gold
-BTG*	BitGem
 BTLC	BitLuckCoin
 BTM	BitMark
-BTM*	Bytom
 BTMI	BitMiles
 BTPL	Bitcoin Planet
 BTQ	BitQuark
 BTS	Bitshares
 BTTF	Coin to the Future
 BTX	Bitcore
-BTX*	BitcoinTX
 BTZ	BitzCoin
 BUCKS	SwagBucks
 BUK	CryptoBuk
@@ -222,7 +196,6 @@ CAP	BottleCaps
 CARBON	Carboncoin
 CASH	CashCoin
 CAT	BlockCAT
-CAT*	BitClave
 CBD	CBD Crystals
 CBX	CryptoBullion
 CC	CyberCoin
@@ -290,7 +263,6 @@ CORAL	CoralPay
 CORE	Core Group Asset
 COSS	COSS
 COV	Covesting
-COV*	CovenCoin
 COVAL	Circuits of Value
 COX	CobraCoin
 CPC	CapriCoin
@@ -599,7 +571,6 @@ GUE	GuerillaCoin
 GUNS	GeoFunders
 GUP	Guppy
 GXC	Gx Coin
-GXC*	GenXCoin
 HAC	Hackspace Capital
 HAL	Halcyon
 HALLO	Halloween Coin
@@ -709,7 +680,6 @@ KING	King93
 KLC	KiloCoin
 KMD	Komodo
 KNC	Kyber Network
-KNC*	Khancoin
 KOBO	KoboCoin
 KOLION	Kolion
 KORE	Kore
@@ -784,7 +754,6 @@ MARS	MarsCoin
 MARV	Marvelous
 MARX	MarxCoin
 MARYJ	MaryJane Coin
-MAT*	Manet Coin
 MAX	MaxCoin
 MAY	Theresa May Coin
 MBI	Monster Byte Inc
@@ -863,7 +832,6 @@ MXT	MartexCoin
 MYB	MyBit
 MYC	MayaCoin
 MYST	Mysterium
-MYST*	MysteryCoin
 MZC	MazaCoin
 N7	Number7
 NAMO	NamoCoin
@@ -884,7 +852,6 @@ NEF	NefariousCoin
 NEO	NEO
 NEOS	NeosCoin
 NET	NetCoin
-NET*	Nimiq Exchange Token
 NETC	NetworkCoin
 NETKO	Netko
 NEU	NeuCoin
@@ -1026,7 +993,6 @@ PSY	Psilocybin
 PTA	PentaCoin
 PTC	PesetaCoin
 PTOY	Patientory
-PTS*	Protoshares
 PULSE	Pulse
 PUPA	PupaCoin
 PUT	PutinCoin
@@ -1064,7 +1030,6 @@ RBY	RubyCoin
 RC	Russiacoin
 RCC	Reality Clash
 RCN	Ripio
-RCN*	RCoin
 RCX	RedCrowCoin
 RDD	ReddCoin
 RDN	RadonPay
@@ -1194,10 +1159,8 @@ SSD	Sonic Screw Driver Coin
 SSTC	SunShotCoin
 SSV	SSVCoin
 STA	Starta
-STA*	Stakers
 STALIN	StalinCoin
 STAR	Starbase
-STAR*	StarCoin
 START	StartCoin
 STCN	Stakecoin
 STEEM	Steem
@@ -1205,14 +1168,12 @@ STEPS	Steps
 STHR	Stakerush
 STO	Save The Ocean
 STORJ	Storj
-STR*	StarCoin
 STRAT	Stratis
 STS	STRESScoin
 STU	BitJob
 STV	Sativa Coin
 STX	Stox
 SUB	Substratum Network
-SUB*	Subscriptio
 SUMO	Sumokoin
 SUP	Supcoin
 SUPER	SuperCoin
@@ -1258,7 +1219,6 @@ TIME	Time
 TIT	TitCoin
 TIX	Blocktix
 TKN	TokenCard  
-TKN*	TrollTokens
 TKR	CryptoInsight
 TKS	Tokes
 TMC	TimesCoin
@@ -1380,7 +1340,6 @@ WOMEN	WomenCoin
 WOP	WorldPay
 WORM	HealthyWorm
 WRC	Worldcore
-WRC*	WarCoin
 WRT	WRTcoin
 WSX	WeAreSatoshi
 WTC	Waltonchain
@@ -1419,7 +1378,6 @@ XGB	GoldenBird
 XGR	GoldReserve
 XHI	HiCoin
 XID	Sphre AIR
-XID*	International Diamond Coin
 XIOS	Xios
 XJO	JouleCoin
 XLB	LibertyCoin
@@ -1495,7 +1453,6 @@ ZNY	BitZeny
 ZOI	Zoin
 ZOOM	ZoomCoin
 ZRC	ZrCoin
-ZRC*	ZiftrCoin
 ZRX	0x
 ZSC	Zeusshield
 ZSE	ZSEcoin

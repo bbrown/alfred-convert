@@ -2,207 +2,212 @@
 Supported Currencies
 ====================
 
-<!-- MarkdownTOC autolink="true" bracket="round" depth="3" autoanchor="true" -->
+Use a currency's symbol in conversions, e.g. `conv 100 eur gbp`. The workflow
+downloads exchange rates only for your
+[active currencies](../README.md#active-currencies).
 
-- [Fiat currencies](#fiat-currencies)
-- [Cryptocurrencies](#cryptocurrencies)
-- [Unsupported currencies](#unsupported-currencies)
-
-<!-- /MarkdownTOC -->
+- [Fiat currencies](#fiat-currencies) (176)
+- [Cryptocurrencies](#cryptocurrencies) (1,448)
+- [Symbols in both lists](#symbols-in-both-lists)
 
 
-<a name="fiat-currencies"></a>
 Fiat currencies
 ---------------
 
-Exchange rates are downloaded from [ExchangeRate-API.com][xapi] and [OpenExchangeRates.org][openx].
+Without an API key, exchange rates come from [ExchangeRate-API.com][xapi]. It
+doesn't offer the 9 currencies marked `*` (as of November 25, 2026). To convert
+those, set `APP_KEY` to an [openexchangerates.org][openx] API key.
+With `APP_KEY` set, all fiat exchange rates come from
+openexchangerates.org. Neither source offers the 4 currencies marked `†` any more, so they can't be converted.
 
-The following fiat currencies are supported by the workflow (currencies marked with `*` require an API key for OpenExchangeRates.org):
+| Symbol | Name                                |
+|--------|-------------------------------------|
+| AED    | United Arab Emirates Dirham         |
+| AFN    | Afghan Afghani                      |
+| ALL    | Albanian Lek                        |
+| AMD    | Armenian Dram                       |
+| ANG    | Netherlands Antillean Guilder       |
+| AOA    | Angolan Kwanza                      |
+| ARS    | Argentine Peso                      |
+| AUD    | Australian Dollar                   |
+| AWG    | Aruban Florin                       |
+| AZN    | Azerbaijani Manat                   |
+| BAM    | Bosnia-Herzegovina Convertible Mark |
+| BBD    | Barbadian Dollar                    |
+| BDT    | Bangladeshi Taka                    |
+| BGN    | Bulgarian Lev                       |
+| BHD    | Bahraini Dinar                      |
+| BIF    | Burundian Franc                     |
+| BMD    | Bermudan Dollar                     |
+| BND    | Brunei Dollar                       |
+| BOB    | Bolivian Boliviano                  |
+| BRL    | Brazilian Real                      |
+| BSD    | Bahamian Dollar                     |
+| BTC    | Bitcoin \*                          |
+| BTN    | Bhutanese Ngultrum                  |
+| BWP    | Botswanan Pula                      |
+| BYN    | Belarusian Ruble                    |
+| BYR    | Belarusian Ruble (pre-2016) †       |
+| BZD    | Belize Dollar                       |
+| CAD    | Canadian Dollar                     |
+| CDF    | Congolese Franc                     |
+| CHF    | Swiss Franc                         |
+| CLF    | Chilean Unit of Account (UF)        |
+| CLP    | Chilean Peso                        |
+| CNH    | Chinese Yuan (Offshore)             |
+| CNY    | Chinese Renminbi                    |
+| COP    | Colombian Peso                      |
+| CRC    | Costa Rican Colón                   |
+| CUC    | Cuban Convertible Peso \*           |
+| CUP    | Cuban Peso                          |
+| CVE    | Cape Verdean Escudo                 |
+| CZK    | Czech Koruna                        |
+| DJF    | Djiboutian Franc                    |
+| DKK    | Danish Krone                        |
+| DOP    | Dominican Peso                      |
+| DZD    | Algerian Dinar                      |
+| EEK    | Estonian Kroon †                    |
+| EGP    | Egyptian Pound                      |
+| ERN    | Eritrean Nakfa                      |
+| ETB    | Ethiopian Birr                      |
+| EUR    | Euro                                |
+| FJD    | Fijian Dollar                       |
+| FKP    | Falkland Islands Pound              |
+| GBP    | British Pound Sterling              |
+| GEL    | Georgian Lari                       |
+| GGP    | Guernsey Pound                      |
+| GHS    | Ghanaian Cedi                       |
+| GIP    | Gibraltar Pound                     |
+| GMD    | Gambian Dalasi                      |
+| GNF    | Guinean Franc                       |
+| GTQ    | Guatemalan Quetzal                  |
+| GYD    | Guyanaese Dollar                    |
+| HKD    | Hong Kong Dollar                    |
+| HNL    | Honduran Lempira                    |
+| HRK    | Croatian Kuna                       |
+| HTG    | Haitian Gourde                      |
+| HUF    | Hungarian Forint                    |
+| IDR    | Indonesian Rupiah                   |
+| ILS    | Israeli Shekel                      |
+| IMP    | Manx pound                          |
+| INR    | Indian Rupee                        |
+| IQD    | Iraqi Dinar                         |
+| IRR    | Iranian Rial                        |
+| ISK    | Icelandic Krona                     |
+| JEP    | Jersey Pound                        |
+| JMD    | Jamaican Dollar                     |
+| JOD    | Jordanian Dinar                     |
+| JPY    | Japanese Yen                        |
+| KES    | Kenyan Shilling                     |
+| KGS    | Kyrgystani Som                      |
+| KHR    | Cambodian Riel                      |
+| KMF    | Comorian Franc                      |
+| KPW    | North Korean Won \*                 |
+| KRW    | South Korean Won                    |
+| KWD    | Kuwaiti Dinar                       |
+| KYD    | Cayman Islands Dollar               |
+| KZT    | Kazakhstani Tenge                   |
+| LAK    | Laotian Kip                         |
+| LBP    | Lebanese Pound                      |
+| LKR    | Sri Lankan Rupee                    |
+| LRD    | Liberian Dollar                     |
+| LSL    | Lesotho Loti                        |
+| LYD    | Libyan Dinar                        |
+| MAD    | Moroccan Dirham                     |
+| MDL    | Moldovan Leu                        |
+| MGA    | Malagasy Ariary                     |
+| MKD    | Macedonian Denar                    |
+| MMK    | Myanma Kyat                         |
+| MNT    | Mongolian Tugrik                    |
+| MOP    | Macanese Pataca                     |
+| MRO    | Mauritanian Ouguiya (pre-2018) †    |
+| MRU    | Mauritanian Ouguiya                 |
+| MTL    | Maltese Lira †                      |
+| MUR    | Mauritian Rupee                     |
+| MVR    | Maldivian Rufiyaa                   |
+| MWK    | Malawian Kwacha                     |
+| MXN    | Mexican Peso                        |
+| MYR    | Malaysian Ringgit                   |
+| MZN    | Mozambican Metical                  |
+| NAD    | Namibian Dollar                     |
+| NGN    | Nigerian Naira                      |
+| NIO    | Nicaraguan Córdoba                  |
+| NOK    | Norwegian Krone                     |
+| NPR    | Nepalese Rupee                      |
+| NZD    | New Zealand Dollar                  |
+| OMR    | Omani Rial                          |
+| PAB    | Panamanian Balboa                   |
+| PEN    | Peruvian Nuevo Sol                  |
+| PGK    | Papua New Guinean Kina              |
+| PHP    | Philippine Peso                     |
+| PKR    | Pakistani Rupee                     |
+| PLN    | Polish Zloty                        |
+| PYG    | Paraguayan Guarani                  |
+| QAR    | Qatari Rial                         |
+| RON    | Romanian Leu                        |
+| RSD    | Serbian Dinar                       |
+| RUB    | Russian Ruble                       |
+| RWF    | Rwandan Franc                       |
+| SAR    | Saudi Riyal                         |
+| SBD    | Solomon Islands Dollar              |
+| SCR    | Seychellois Rupee                   |
+| SDG    | Sudanese Pound                      |
+| SEK    | Swedish Krona                       |
+| SGD    | Singapore Dollar                    |
+| SHP    | Saint Helena Pound                  |
+| SLE    | Sierra Leonean Leone                |
+| SLL    | Sierra Leonean Leone (Old)          |
+| SOS    | Somali Shilling                     |
+| SRD    | Surinamese Dollar                   |
+| SSP    | South Sudanese Pound                |
+| STN    | São Tomé and Príncipe Dobra         |
+| SVC    | Salvadoran Colón \*                 |
+| SYP    | Syrian Pound                        |
+| SZL    | Swazi Lilangeni                     |
+| THB    | Thai Baht                           |
+| TJS    | Tajikistani Somoni                  |
+| TMT    | Turkmenistani Manat                 |
+| TND    | Tunisian Dinar                      |
+| TOP    | Tongan Paʻanga                      |
+| TRY    | Turkish Lira                        |
+| TTD    | Trinidad and Tobago Dollar          |
+| TWD    | New Taiwan Dollar                   |
+| TZS    | Tanzanian Shilling                  |
+| UAH    | Ukrainian Hryvnia                   |
+| UGX    | Ugandan Shilling                    |
+| USD    | US Dollar                           |
+| UYU    | Uruguayan Peso                      |
+| UZS    | Uzbekistan Som                      |
+| VEF    | Venezuelan Bolívar Fuerte \*        |
+| VES    | Venezuelan Bolívar Soberano         |
+| VND    | Vietnamese Dong                     |
+| VUV    | Vanuatu Vatu                        |
+| WST    | Samoan Tala                         |
+| XAF    | CFA Franc BEAC                      |
+| XAG    | Silver (troy ounce) \*              |
+| XAU    | Gold (troy ounce) \*                |
+| XCD    | East Caribbean Dollar               |
+| XCG    | Caribbean Guilder                   |
+| XDR    | Special Drawing Rights              |
+| XOF    | CFA Franc BCEAO                     |
+| XPD    | Palladium Ounce \*                  |
+| XPF    | CFP Franc                           |
+| XPT    | Platinum Ounce \*                   |
+| YER    | Yemeni Rial                         |
+| ZAR    | South African Rand                  |
+| ZMW    | Zambian Kwacha                      |
+| ZWG    | Zimbabwean ZiG                      |
+| ZWL    | Zimbabwean Dollar                   |
 
-| Symbol |                  Name                  |
-|--------|----------------------------------------|
-| AED    | United Arab Emirates Dirham            |
-| AFN    | Afghan Afghani \*                      |
-| ALL    | Albanian Lek \*                        |
-| AMD    | Armenian Dram \*                       |
-| ANG    | Netherlands Antillean Guilder \*       |
-| AOA    | Angolan Kwanza \*                      |
-| ARS    | Argentine Peso                         |
-| AUD    | Australian Dollar                      |
-| AWG    | Aruban Florin \*                       |
-| AZN    | Azerbaijani Manat \*                   |
-| BAM    | Bosnia-Herzegovina Convertible Mark \* |
-| BBD    | Barbadian Dollar \*                    |
-| BDT    | Bangladeshi Taka \*                    |
-| BGN    | Bulgarian Lev                          |
-| BHD    | Bahraini Dinar \*                      |
-| BIF    | Burundian Franc \*                     |
-| BMD    | Bermudan Dollar \*                     |
-| BND    | Brunei Dollar \*                       |
-| BOB    | Bolivian Boliviano \*                  |
-| BRL    | Brazilian Real                         |
-| BSD    | Bahamian Dollar                        |
-| BTC    | Bitcoin \*                             |
-| BTN    | Bhutanese Ngultrum \*                  |
-| BWP    | Botswanan Pula \*                      |
-| BYN    | Belarusian Ruble \*                    |
-| BYR    | Belarusian Ruble (pre-2016) \*         |
-| BZD    | Belize Dollar \*                       |
-| CAD    | Canadian Dollar                        |
-| CDF    | Congolese Franc \*                     |
-| CHF    | Swiss Franc                            |
-| CLF    | Chilean Unit of Account (UF) \*        |
-| CLP    | Chilean Peso                           |
-| CNH    | Chinese Yuan (Offshore) \*             |
-| CNY    | Chinese Renminbi                       |
-| COP    | Colombian Peso                         |
-| CRC    | Costa Rican Colón \*                   |
-| CUC    | Cuban Convertible Peso \*              |
-| CUP    | Cuban Peso \*                          |
-| CVE    | Cape Verdean Escudo \*                 |
-| CZK    | Czech Koruna                           |
-| DJF    | Djiboutian Franc \*                    |
-| DKK    | Danish Krone                           |
-| DOP    | Dominican Peso                         |
-| DZD    | Algerian Dinar \*                      |
-| EEK    | Estonian Kroon \*                      |
-| EGP    | Egyptian Pound                         |
-| ERN    | Eritrean Nakfa \*                      |
-| ETB    | Ethiopian Birr \*                      |
-| EUR    | Euro                                   |
-| FJD    | Fijian Dollar                          |
-| FKP    | Falkland Islands Pound \*              |
-| GBP    | British Pound Sterling                 |
-| GEL    | Georgian Lari \*                       |
-| GGP    | Guernsey Pound \*                      |
-| GHS    | Ghanaian Cedi \*                       |
-| GIP    | Gibraltar Pound \*                     |
-| GMD    | Gambian Dalasi \*                      |
-| GNF    | Guinean Franc \*                       |
-| GTQ    | Guatemalan Quetzal                     |
-| GYD    | Guyanaese Dollar \*                    |
-| HKD    | Hong Kong Dollar                       |
-| HNL    | Honduran Lempira \*                    |
-| HRK    | Croatian Kuna                          |
-| HTG    | Haitian Gourde \*                      |
-| HUF    | Hungarian Forint                       |
-| IDR    | Indonesian Rupiah                      |
-| ILS    | Israeli Shekel                         |
-| IMP    | Manx pound \*                          |
-| INR    | Indian Rupee                           |
-| IQD    | Iraqi Dinar \*                         |
-| IRR    | Iranian Rial \*                        |
-| ISK    | Icelandic Krona                        |
-| JEP    | Jersey Pound \*                        |
-| JMD    | Jamaican Dollar \*                     |
-| JOD    | Jordanian Dinar \*                     |
-| JPY    | Japanese Yen                           |
-| KES    | Kenyan Shilling \*                     |
-| KGS    | Kyrgystani Som \*                      |
-| KHR    | Cambodian Riel \*                      |
-| KMF    | Comorian Franc \*                      |
-| KPW    | North Korean Won \*                    |
-| KRW    | South Korean Won                       |
-| KWD    | Kuwaiti Dinar \*                       |
-| KYD    | Cayman Islands Dollar \*               |
-| KZT    | Kazakhstani Tenge                      |
-| LAK    | Laotian Kip \*                         |
-| LBP    | Lebanese Pound \*                      |
-| LKR    | Sri Lankan Rupee \*                    |
-| LRD    | Liberian Dollar \*                     |
-| LSL    | Lesotho Loti \*                        |
-| LYD    | Libyan Dinar \*                        |
-| MAD    | Moroccan Dirham \*                     |
-| MDL    | Moldovan Leu \*                        |
-| MGA    | Malagasy Ariary \*                     |
-| MKD    | Macedonian Denar \*                    |
-| MMK    | Myanma Kyat \*                         |
-| MNT    | Mongolian Tugrik \*                    |
-| MOP    | Macanese Pataca \*                     |
-| MRO    | Mauritanian Ouguiya (pre-2018) \*      |
-| MRU    | Mauritanian Ouguiya \*                 |
-| MTL    | Maltese Lira \*                        |
-| MUR    | Mauritian Rupee \*                     |
-| MVR    | Maldivian Rufiyaa \*                   |
-| MWK    | Malawian Kwacha \*                     |
-| MXN    | Mexican Peso                           |
-| MYR    | Malaysian Ringgit                      |
-| MZN    | Mozambican Metical \*                  |
-| NAD    | Namibian Dollar \*                     |
-| NGN    | Nigerian Naira \*                      |
-| NIO    | Nicaraguan Córdoba \*                  |
-| NOK    | Norwegian Krone                        |
-| NPR    | Nepalese Rupee \*                      |
-| NZD    | New Zealand Dollar                     |
-| OMR    | Omani Rial \*                          |
-| PAB    | Panamanian Balboa                      |
-| PEN    | Peruvian Nuevo Sol                     |
-| PGK    | Papua New Guinean Kina \*              |
-| PHP    | Philippine Peso                        |
-| PKR    | Pakistani Rupee                        |
-| PLN    | Polish Zloty                           |
-| PYG    | Paraguayan Guarani                     |
-| QAR    | Qatari Rial \*                         |
-| RON    | Romanian Leu                           |
-| RSD    | Serbian Dinar \*                       |
-| RUB    | Russian Ruble                          |
-| RWF    | Rwandan Franc \*                       |
-| SAR    | Saudi Riyal                            |
-| SBD    | Solomon Islands Dollar \*              |
-| SCR    | Seychellois Rupee \*                   |
-| SDG    | Sudanese Pound \*                      |
-| SEK    | Swedish Krona                          |
-| SGD    | Singapore Dollar                       |
-| SHP    | Saint Helena Pound \*                  |
-| SLL    | Sierra Leonean Leone \*                |
-| SOS    | Somali Shilling \*                     |
-| SRD    | Surinamese Dollar \*                   |
-| SSP    | South Sudanese Pound \*                |
-| STN    | São Tomé and Príncipe Dobra \*         |
-| SVC    | Salvadoran Colón \*                    |
-| SYP    | Syrian Pound \*                        |
-| SZL    | Swazi Lilangeni \*                     |
-| THB    | Thai Baht                              |
-| TJS    | Tajikistani Somoni \*                  |
-| TMT    | Turkmenistani Manat \*                 |
-| TND    | Tunisian Dinar \*                      |
-| TOP    | Tongan Paʻanga \*                      |
-| TRY    | Turkish Lira                           |
-| TTD    | Trinidad and Tobago Dollar \*          |
-| TWD    | New Taiwan Dollar                      |
-| TZS    | Tanzanian Shilling \*                  |
-| UAH    | Ukrainian Hryvnia                      |
-| UGX    | Ugandan Shilling \*                    |
-| USD    | US Dollar                              |
-| UYU    | Uruguayan Peso                         |
-| UZS    | Uzbekistan Som \*                      |
-| VEF    | Venezuelan Bolívar Fuerte \*           |
-| VND    | Vietnamese Dong \*                     |
-| VUV    | Vanuatu Vatu \*                        |
-| WST    | Samoan Tala \*                         |
-| XAF    | CFA Franc BEAC \*                      |
-| XAG    | Silver (troy ounce) \*                 |
-| XAU    | Gold (troy ounce) \*                   |
-| XCD    | East Caribbean Dollar \*               |
-| XDR    | Special Drawing Rights \*              |
-| XOF    | CFA Franc BCEAO \*                     |
-| XPD    | Palladium Ounce \*                     |
-| XPF    | CFP Franc \*                           |
-| XPT    | Platinum Ounce \*                      |
-| YER    | Yemeni Rial \*                         |
-| ZAR    | South African Rand                     |
-| ZMW    | Zambian Kwacha                         |
 
-
-<a name="cryptocurrencies"></a>
 Cryptocurrencies
 ----------------
 
-Exchange rates are downloaded from [CryptoCompare.com][cryptocompare].
+Exchange rates come from [CryptoCompare][cryptocompare] and need a
+CryptoCompare API key in `CRYPTO_API_KEY`. The list leaves out coins whose
+symbols Pint can't use as unit names, such as `1ST` or `STR*`.
 
-The following cryptocurrencies are supported by the workflow:
-
-|  Symbol  |                 Name                 |
+| Symbol   | Name                                 |
 |----------|--------------------------------------|
 | ABC      | AB-Chain                             |
 | ABY      | ArtByte                              |
@@ -282,7 +287,6 @@ The following cryptocurrencies are supported by the workflow:
 | AXIOM    | Axiom Coin                           |
 | AXR      | AXRON                                |
 | B3       | B3 Coin                              |
-| B@       | BankCoin                             |
 | BAC      | BitalphaCoin                         |
 | BAN      | Babes and Nerds                      |
 | BAR      | TBIS token                           |
@@ -305,7 +309,6 @@ The following cryptocurrencies are supported by the workflow:
 | BERN     | BERNcash                             |
 | BEST     | BestChain                            |
 | BET      | BetaCoin                             |
-| BET*     | DAO.casino                           |
 | BFX      | BitFinex Tokens                      |
 | BHC      | BighanCoin                           |
 | BIC      | Bikercoins                           |
@@ -1023,7 +1026,6 @@ The following cryptocurrencies are supported by the workflow:
 | MST      | MustangCoin                          |
 | MT       | Mycelium Token                       |
 | MTH      | Monetha                              |
-| MTL      | Metal                                |
 | MTR      | MasterTraderCoin                     |
 | MUDRA    | MudraCoin                            |
 | MUE      | MonetaryUnit                         |
@@ -1417,7 +1419,6 @@ The following cryptocurrencies are supported by the workflow:
 | TIT      | TitCoin                              |
 | TIX      | Blocktix                             |
 | TKN      | TokenCard                            |
-| TKN*     | TrollTokens                          |
 | TKR      | CryptoInsight                        |
 | TKS      | Tokes                                |
 | TMC      | TimesCoin                            |
@@ -1545,7 +1546,6 @@ The following cryptocurrencies are supported by the workflow:
 | WTT      | Giga Watt                            |
 | X2       | X2Coin                               |
 | XAI      | SapienceCoin                         |
-| XAU      | XauCoin                              |
 | XAUR     | Xaurum                               |
 | XBC      | BitcoinPlus                          |
 | XBOT     | SocialXbotCoin                       |
@@ -1594,7 +1594,6 @@ The following cryptocurrencies are supported by the workflow:
 | XNX      | XanaxCoin                            |
 | XP       | XP                                   |
 | XPB      | Pebble Coin                          |
-| XPD      | PetroDollar                          |
 | XPH      | PharmaCoin                           |
 | XPM      | PrimeCoin                            |
 | XPO      | Opair                                |
@@ -1660,65 +1659,12 @@ The following cryptocurrencies are supported by the workflow:
 | ZYD      | ZayedCoin                            |
 
 
-<a name="unsupported-currencies"></a>
-Unsupported currencies
-----------------------
+Symbols in both lists
+---------------------
 
-The following (crypto)currencies are unsupported. Some have symbols that conflict with other currencies, and others cannot be understood by the `pint` library as they start with digits or end with `*`.
-
-| Symbol |                     Name                     |
-|--------|----------------------------------------------|
-| 007    | 007 coin                                     |
-| 1337   | 1337                                         |
-| 1CR    | 1Credit                                      |
-| 1ST    | FirstBlood                                   |
-| 2015   | 2015 coin                                    |
-| 2BACCO | 2BACCO Coin                                  |
-| 2GIVE  | 2GiveCoin                                    |
-| 32BIT  | 32Bitcoin                                    |
-| 365    | 365Coin                                      |
-| 404    | 404Coin                                      |
-| 42     | 42 Coin                                      |
-| 4CHN   | ChanCoin                                     |
-| 611    | SixEleven                                    |
-| 808    | 808                                          |
-| 888    | Octocoin                                     |
-| 8BIT   | 8BIT Coin                                    |
-| 8BT    | 8 Circuit Studios                            |
-| AIR*   | Aircoin                                      |
-| ARC*   | ArcticCoin                                   |
-| AST*   | Astral                                       |
-| BNB*   | Boats and Bitches                            |
-| BOB    | Bob Coin                                     |
-| BSD    | BitSend                                      |
-| BTG*   | BitGem                                       |
-| BTM*   | Bytom                                        |
-| BTX*   | BitcoinTX                                    |
-| CAT*   | BitClave                                     |
-| CNT    | Centurion                                    |
-| COV*   | CovenCoin                                    |
-| CRC    | CraftCoin                                    |
-| GHS    | Giga Hash                                    |
-| GXC*   | GenXCoin                                     |
-| KNC*   | Khancoin                                     |
-| MAD    | SatoshiMadness                               |
-| MAT*   | Manet Coin                                   |
-| MYST*  | MysteryCoin                                  |
-| NET*   | Nimiq Exchange Token                         |
-| PEN    | PenCoin                                      |
-| PTS*   | Protoshares                                  |
-| RCN*   | RCoin                                        |
-| SAR    | SARCoin                                      |
-| SBD    | Steem Backed Dollar                          |
-| SLS    | SaluS                                        |
-| STA*   | Stakers                                      |
-| STAR*  | StarCoin                                     |
-| SUB*   | Subscriptio                                  |
-| WRC*   | WarCoin                                      |
-| XBC    | Bond Markets Unit European Unit of Account 9 |
-| XID*   | International Diamond Coin                   |
-| XPD    | Palladium                                    |
-| ZRC*   | ZiftrCoin                                    |
+- `BTC` is Bitcoin in both lists, so either API key adds it.
+- `MTL` means Maltese Lira, not the Metal cryptocurrency.
+- `XPD` means Palladium Ounce, not the PetroDollar cryptocurrency.
 
 
 [xapi]: https://www.exchangerate-api.com/

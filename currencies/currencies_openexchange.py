@@ -91,7 +91,7 @@ def get_exchange_rates(symbols):
 
 
 def main():
-    """Generate list of currencies supported by Yahoo! Finance."""
+    """Generate list of currencies supported by openexchangerates.org."""
     unknown_currencies = []
     all_currencies = load_currencies(*currency_source_files)
 

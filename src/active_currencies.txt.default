@@ -140,6 +140,7 @@ SDG
 SEK
 SGD
 SHP
+SLE
 SLL
 SOS
 SRD
@@ -163,6 +164,7 @@ USD
 UYU
 UZS
 VEF
+VES
 VND
 VUV
 WST
@@ -170,6 +172,7 @@ XAF
 XAG
 XAU
 XCD
+XCG
 XDR
 XOF
 XPD
@@ -178,6 +181,8 @@ XPT
 YER
 ZAR
 ZMW
+ZWG
+ZWL
 
 # Crypto currencies
 AUR
