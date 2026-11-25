@@ -2,9 +2,9 @@
 Changelog
 =========
 
-### 3.8.0 ###
+### [3.8.0][v3.8.0] ###
 
-Unreleased
+Released 2026-11-25
 
 - Port to Python 3 (`/usr/bin/python3`): works on macOS 12.3+ and Alfred 5/6
 - Update Pint to 0.24.4 and replace Alfred-Workflow with Alfred-PyWorkflow
@@ -243,4 +243,5 @@ Released 2014-08-09.
 [v3.6.1]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.1
 [v3.6.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.2
 [v3.7.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.7.0
+[v3.8.0]: https://github.com/bbrown/alfred-convert/releases/tag/v3.8.0
 [openx]: https://openexchangerates.org/
