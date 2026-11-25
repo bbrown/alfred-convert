@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
@@ -16,7 +16,7 @@ from collections import namedtuple
 import logging
 
 import pytest
-from workflow import Workflow3
+from workflow import Workflow
 
 import convert
 from defaults import Defaults
@@ -24,6 +24,9 @@ from defaults import Defaults
 logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger()
 convert.log = logging.getLogger('convert')
+# Normally created by convert.main()
+convert.ureg = convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS)
+convert.ureg.formatter.default_format = 'P'
 
 
 T = namedtuple('T', 'number dimensionality from_unit to_unit')
@@ -66,7 +69,8 @@ def test_valid():
     data = [
         ('1.3 km', T(1.3, '[length]', 'kilometer', None)),
         ('1.3 km miles', T(1.3, '[length]', 'kilometer', 'mile')),
-        ('5 m/s kph', T(5.0, '[length] / [time]', 'meter/second', 'kph')),
+        ('5 m/s kph', T(5.0, '[length] / [time]', 'meter/second',
+                        'kilometer_per_hour')),
         ('21.3 m^2 acres', T(21.3, '[length] ** 2', u'meter²', 'acre')),
     ]
     c = convert.Converter(None)
@@ -98,7 +102,7 @@ def test_defaults():
             C(100, 'gram', 100000, 'milligram', '[mass]')]),
     ]
 
-    wf = Workflow3()
+    wf = Workflow()
     if 'default_units' not in wf.settings:
         wf.settings['default_units'] = {}
 
@@ -115,6 +119,27 @@ def test_defaults():
             log.debug(r)
             verify_conversion(t[1][j], r)
 
+
+def test_rate_sources_change_clears_cache(tmp_path, monkeypatch):
+    """Setting or removing an API key clears cached exchange rates."""
+    cleared = []
+
+    class FakeWorkflow(object):
+        def cachefile(self, name):
+            return str(tmp_path / name)
+
+        def cache_data(self, name, data):
+            cleared.append((name, data))
+
+    wf = FakeWorkflow()
+    monkeypatch.setattr(convert, 'CRYPTO_API_KEY', None)
+    convert.handle_update(wf)  # no record of previous sources
+    convert.handle_update(wf)  # unchanged
+    assert cleared == [('exchange_rates', None)]
+
+    monkeypatch.setattr(convert, 'CRYPTO_API_KEY', 'key')
+    convert.handle_update(wf)
+    assert len(cleared) == 2
 
 
 if __name__ == '__main__':  # pragma: no cover

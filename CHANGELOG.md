@@ -2,6 +2,17 @@
 Changelog
 =========
 
+### 3.8.0 ###
+
+Unreleased
+
+- Port to Python 3 (`/usr/bin/python3`): works on macOS 12.3+ and Alfred 5/6
+- Update Pint to 0.24.4 and replace Alfred-Workflow with Alfred-PyWorkflow
+- Some units now display with Pint's current names, e.g. `kph` → `kilometer_per_hour`, `degF` → `degree_Fahrenheit`
+- Cryptocurrency rates require a CryptoCompare API key (`CRYPTO_API_KEY`, optional). Without it, crypto rates are skipped instead of breaking all currency updates
+- Remove update checks against the archived upstream repo
+
+
 ### [3.7.0][v3.7.0] ###
 
 Released 2020-02-20

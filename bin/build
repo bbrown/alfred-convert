@@ -8,7 +8,7 @@ root="$( cd "$here/../"; pwd )"
 builddir="${root}/build"
 srcdir="${root}/src"
 
-noexport=(APP_KEY)
+noexport=(APP_KEY CRYPTO_API_KEY)
 
 verbose=false
 
@@ -80,8 +80,6 @@ done
 shift $((OPTIND-1))
 
 
-hash workflow-build &>/dev/null || fail "workflow-build script not found"
-
 test -d "$builddir" && {
   info "cleaning builddir ..."
   rm -rf $vopt "$builddir/"*
@@ -113,8 +111,13 @@ done
 cd -
 
 info "building workflow ..."
-workflow-build -f $vopt "$builddir"
-success "built workflow"
+# An .alfredworkflow file is just a zip of the workflow directory
+name="$( /usr/libexec/PlistBuddy -c 'Print :name' "$builddir/info.plist" )"
+version="$( /usr/libexec/PlistBuddy -c 'Print :version' "$builddir/info.plist" )"
+outfile="${root}/${name}-${version}.alfredworkflow"
+rm -f "$outfile"
+( cd "$builddir" && zip -rq "$outfile" . )
+success "built $outfile"
 
 info "clearing builddir ..."
 rm -rf $vopt "$builddir/"*

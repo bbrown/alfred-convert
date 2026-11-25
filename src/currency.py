@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
@@ -12,7 +12,7 @@
 
 from __future__ import print_function
 
-from itertools import izip_longest
+from itertools import zip_longest
 from multiprocessing.dummy import Pool
 import os
 import time
@@ -26,6 +26,7 @@ from config import (
     CURRENCY_CACHE_NAME,
     REFERENCE_CURRENCY,
     CURRENCIES,
+    CRYPTO_API_KEY,
     CRYPTO_CURRENCIES,
     CRYPTO_COMPARE_BASE_URL,
     OPENX_API_URL,
@@ -54,7 +55,7 @@ def grouper(n, iterable):
     sentinel = object()
     args = [iter(iterable)] * n
     groups = []
-    for l in izip_longest(*args, fillvalue=sentinel):
+    for l in zip_longest(*args, fillvalue=sentinel):
         groups.append([v for v in l if v is not sentinel])
     return groups
 
@@ -73,15 +74,23 @@ def load_cryptocurrency_rates(symbols):
     url = CRYPTO_COMPARE_BASE_URL.format(REFERENCE_CURRENCY, ','.join(symbols))
 
     log.debug('fetching %s ...', url)
-    r = web.get(url, headers={'User-Agent': USER_AGENT})
-    r.raise_for_status()
+    headers = {'User-Agent': USER_AGENT,
+               'Authorization': 'Apikey ' + CRYPTO_API_KEY}
+    try:
+        r = web.get(url, headers=headers)
+        r.raise_for_status()
+        data = r.json()
+    except Exception as err:  # optional source: never lose the fiat rates
+        log.error('[CryptoCompare.com] not fetching rates: %s', err)
+        return {}
 
-    data = r.json()
-    for sym, rate in data.items():
+    # API errors arrive as HTTP 200 JSON, so keep only requested symbols
+    rates = {sym: data[sym] for sym in symbols if sym in data}
+    for sym, rate in rates.items():
         log.debug('[CryptoCompare.com] 1 %s = %s %s',
                   REFERENCE_CURRENCY, rate, sym)
 
-    return data
+    return rates
 
 
 def load_xra_rates(symbols):
@@ -206,8 +215,12 @@ def fetch_exchange_rates():
         if s in active:
             syms.append(s)
     # syms = [s for s in CRYPTO_CURRENCIES.keys() if s in active]
-    for symbols in grouper(SYMBOLS_PER_REQUEST, syms):
-        jobs.append((load_cryptocurrency_rates, (symbols,)))
+    if CRYPTO_API_KEY:
+        for symbols in grouper(SYMBOLS_PER_REQUEST, syms):
+            jobs.append((load_cryptocurrency_rates, (symbols,)))
+    else:
+        log.info('not fetching cryptocurrency exchange rates: '
+                 'CRYPTO_API_KEY not set')
 
     # fetch data in a thread pool
     pool = Pool(2)

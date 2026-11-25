@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
@@ -31,6 +31,8 @@ COPY_UNIT = os.getenv('COPY_UNIT', '') not in ('', '0')
 # ----------------------------------------------------------------------
 # API key for openexchangerates.org
 OPENX_APP_KEY = os.getenv('APP_KEY') or None
+# API key for CryptoCompare.com (optional: no crypto rates without it)
+CRYPTO_API_KEY = os.getenv('CRYPTO_API_KEY') or None
 # Update interval (default 6 hours)
 CURRENCY_CACHE_AGE = int(os.getenv('UPDATE_INTERVAL') or '360') * 60
 
@@ -42,7 +44,7 @@ CRYPTO_COMPARE_BASE_URL = (
     'https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}')
 SYMBOLS_PER_REQUEST = 20
 USER_AGENT = 'Alfred Convert/{}'.format(os.getenv('alfred_workflow_version'))
-NOKEY_FILENAME = 'nokey'
+SOURCES_FILENAME = 'rate_sources'
 
 # ----------------------------------------------------------------------
 # Unit definition files
@@ -1748,12 +1750,10 @@ README_URL = 'https://github.com/deanishe/alfred-convert#alfred-convert'
 # ----------------------------------------------------------------------
 ICON_CURRENCY = 'icons/money.png'
 ICON_HELP = 'icons/help.png'
-ICON_UPDATE = 'icons/update-available.png'
 
 # ----------------------------------------------------------------------
-# Update and default user settings
+# Default user settings
 # ----------------------------------------------------------------------
-UPDATE_SETTINGS = {'github_slug': 'deanishe/alfred-convert'}
 DEFAULT_SETTINGS = {}
 
 
@@ -1761,7 +1761,7 @@ def bootstrap(wf):
     """Copy default files to user data if necessary.
 
     Args:
-        wf (Workflow3): Active `Workflow3` object.
+        wf (Workflow): Active `Workflow` object.
 
     """
     filepaths = [

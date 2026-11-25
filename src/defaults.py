@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
@@ -27,7 +27,7 @@ from __future__ import print_function, absolute_import
 from collections import defaultdict
 
 from docopt import docopt
-from workflow import Workflow3
+from workflow import Workflow
 
 
 log = None
@@ -44,7 +44,7 @@ class Defaults(object):
         """Create new `Defaults` for workflow.
 
         Args:
-            wf (Workflow3): Active Workflow3 object.
+            wf (Workflow): Active Workflow object.
         """
         self._wf = wf
         self._defs = self._load()
@@ -130,6 +130,6 @@ def main(wf):
 
 
 if __name__ == '__main__':
-    wf = Workflow3()
+    wf = Workflow()
     log = wf.logger
     wf.run(main)

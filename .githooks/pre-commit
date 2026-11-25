@@ -36,8 +36,8 @@ _getvar() {
 # Fail if info.plist can't be found
 test -f "$ip" || { _fail "$ip not found"; }
 
-api_key="$( _getvar APP_KEY )"
-
-test -n "$api_key" && _fail "[info.plist] APP_KEY is not empty"
+for v in APP_KEY CRYPTO_API_KEY; do
+  test -n "$( _getvar $v )" && _fail "[info.plist] $v is not empty"
+done
 
 exit 0

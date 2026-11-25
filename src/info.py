@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
@@ -45,7 +45,7 @@ from workflow import (
     ICON_WEB,
     MATCH_ALL,
     MATCH_ALLCHARS,
-    Workflow3,
+    Workflow,
 )
 from workflow.util import run_trigger
 
@@ -252,6 +252,6 @@ def main(wf):
 
 
 if __name__ == '__main__':
-    wf = Workflow3()
+    wf = Workflow()
     log = wf.logger
     sys.exit(wf.run(main))

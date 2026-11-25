@@ -2,7 +2,7 @@
 Alfred-Convert
 ==============
 
-Convert between different units offline in [Alfred 3 & 4][alfred].
+Convert between different units offline in [Alfred 4+][alfred].
 
 ![][demo]
 
@@ -38,6 +38,8 @@ Download from [GitHub releases][ghreleases].
 
 **Note**: Version 3.7 and above only supports Alfred 4+. If you're still using Alfred 3, please download [v3.6.2][v3.6.2].
 
+**Note**: Version 3.8 and above requires Python 3 (`/usr/bin/python3`). If it isn't installed, macOS offers to install it (with the Xcode Command Line Tools) the first time it's run.
+
 
 <a name="usage"></a>
 Usage
@@ -59,6 +61,8 @@ Usage
 ### Conversions ###
 
 **NOTE**: Only a limited number of fiat currencies are supported by default. Additional rates are only supported if you set a key for the [openexchangerates.org][openx] API in the workflow's [configuration sheet](#configuration). You can sign up for a free account [here][openx-free]. When you're signed up, copy the **App ID** from the email you receive or [this page][openx-appid] into the `APP_KEY` field in the [configuration sheet](#configuration).
+
+**NOTE**: Cryptocurrency conversions require a (free) [CryptoCompare][cryptocompare] API key, which you can get from [CoinDesk][coindesk-key]. Enter it in the `CRYPTO_API_KEY` field in the [configuration sheet](#configuration). The key is optional: without it, everything else works as normal, but cryptocurrency exchange rates aren't downloaded, so cryptocurrencies can't be converted.
 
 - `conv [<context>] <quantity> <from unit> [<to unit>]` — Perform a conversion
     - `↩` or `⌘C` — Copy the result to the pasteboard
@@ -98,6 +102,7 @@ Basic configuration is performed in the [configuration sheet][config-sheet]:
 |---------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | `APP_KEY`                 | API key for [openexchangerates.org][openx].                                                                                                   |
 | `COPY_UNIT`               | Include unit when copying conversion result. Any value but `0` or empty turns this option on.                                                 |
+| `CRYPTO_API_KEY`          | API key for [CryptoCompare][cryptocompare] (free from [CoinDesk][coindesk-key]). Optional: cryptocurrencies are only converted if it is set.  |
 | `CURRENCY_DECIMAL_PLACES` | Overrides the default `DECIMAL_PLACES` setting for currency conversions.                                                                      |
 | `DECIMAL_PLACES`          | Number of decimal places to show in results.                                                                                                  |
 | `DECIMAL_SEPARATOR`       | Character to separate whole numbers and decimal fractions. Used for parsing input and generating output.                                      |
@@ -108,7 +113,7 @@ Basic configuration is performed in the [configuration sheet][config-sheet]:
 
 #### Active currencies ####
 
-By default, all supported fiat currencies (provided you've set `APP_KEY` in the [configuration sheet](#configuration)) and a handful of the most popular cryptocurrencies are active.
+By default, all supported fiat currencies (provided you've set `APP_KEY` in the [configuration sheet](#configuration)) and a handful of the most popular cryptocurrencies (provided you've set `CRYPTO_API_KEY`) are active.
 
 - `convinfo`
     - `View All Supported Currencies`
@@ -239,6 +244,7 @@ All other code/media are released under the [MIT Licence][mit].
 [v3.6.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.2
 [v3.7.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.7.0
 [cryptocompare]: https://www.cryptocompare.com/
+[coindesk-key]: https://developers.coindesk.com/
 [openx]: https://openexchangerates.org/
 [openx-free]: https://openexchangerates.org/signup/free
 [openx-appid]: https://openexchangerates.org/account/app-ids

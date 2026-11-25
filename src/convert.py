@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
@@ -17,14 +17,14 @@ import sys
 
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
-from workflow import Workflow3, ICON_WARNING, ICON_INFO
+from workflow import Workflow, ICON_WARNING, ICON_INFO
 from workflow.background import run_in_background, is_running
-from workflow.update import Version
 from config import (
     bootstrap,
     DEFAULT_UNIT_DEFINITIONS,
     BUILTIN_UNIT_DEFINITIONS,
     COPY_UNIT,
+    CRYPTO_API_KEY,
     CURRENCY_CACHE_AGE,
     CURRENCY_CACHE_NAME,
     CURRENCY_DECIMAL_PLACES,
@@ -34,11 +34,9 @@ from config import (
     DEFAULT_SETTINGS,
     DYNAMIC_DECIMALS,
     HELP_URL,
-    ICON_UPDATE,
-    NOKEY_FILENAME,
     OPENX_APP_KEY,
+    SOURCES_FILENAME,
     THOUSANDS_SEPARATOR,
-    UPDATE_SETTINGS,
 )
 from defaults import Defaults
 
@@ -88,35 +86,24 @@ def show_currency_help():
 
 
 def handle_update(wf):
-    """Clear cache on update.
+    """Clear cached exchange rates if the configured rate sources changed.
 
-    Delete cached data if last-run version used a different format,
-    or if user has just added the ``APP_KEY`` for fiat currency
-    exchange rates.
+    E.g. the user has just set or removed ``APP_KEY`` or ``CRYPTO_API_KEY``,
+    so cached rates are from the wrong sources until they expire.
 
     """
-    nokey = wf.cachefile(NOKEY_FILENAME)
-    clear = False
+    path = wf.cachefile(SOURCES_FILENAME)
+    sources = 'openx={} crypto={}'.format(bool(OPENX_APP_KEY),
+                                          bool(CRYPTO_API_KEY))
+    if os.path.exists(path):
+        with open(path) as fp:
+            if fp.read() == sources:
+                return
 
-    # Clear cache if previous version was old
-    lv = wf.last_version_run
-    log.debug('version=%s, last_version=%s', wf.version, lv)
-    if wf.version > Version('3.0') and lv < Version('3.1'):
-        log.debug('clearing cache: saved data is incompatible')
-        clear = True
-
-    if OPENX_APP_KEY:
-        if os.path.exists(nokey):
-            os.unlink(nokey)
-            log.debug('clearing cache: APP_KEY was set')
-            clear = True
-    else:
-        if not os.path.exists(nokey):
-            open(nokey, 'wb').write('')
-
-    if clear:
-        wf.cache_data(CURRENCY_CACHE_NAME, None)
-        log.debug('cleared old cached currencies')
+    wf.cache_data(CURRENCY_CACHE_NAME, None)
+    with open(path, 'w') as fp:
+        fp.write(sources)
+    log.debug('cleared cached exchange rates: sources are now %s', sources)
 
 
 class NoToUnits(Exception):
@@ -273,7 +260,7 @@ class Conversion(object):
         """Pretty string representation."""
         return u'{:f} {} = {:f} {} {}'.format(
             self.from_number, self.from_unit, self.to_number, self.to_unit,
-            self.dimensionality).encode('utf-8')
+            self.dimensionality)
 
     def __repr__(self):
         """Code-like representation."""
@@ -386,9 +373,9 @@ class Converter(object):
         # Create `Input` from parsed query
         tu = None
         if to_unit:
-            tu = unicode(to_unit.units)
-        i = Input(from_unit.magnitude, unicode(from_unit.dimensionality),
-                  unicode(from_unit.units), tu, ctx)
+            tu = str(to_unit.units)
+        i = Input(from_unit.magnitude, str(from_unit.dimensionality),
+                  str(from_unit.units), tu, ctx)
 
         log.debug('[parser] %s', i)
 
@@ -560,7 +547,7 @@ def convert(query):
         i = c.parse(query)
     except ValueError as err:
         log.critical(u'invalid query (%s): %s', query, err)
-        error = err.message
+        error = str(err)
 
     else:
         try:
@@ -634,8 +621,10 @@ def main(wf):
 
     """
     global ureg
-    ureg = UnitRegistry(wf.decode(DEFAULT_UNIT_DEFINITIONS))
-    ureg.default_format = 'P'
+    # Cache parsed definitions: saves ~80 ms per keystroke
+    ureg = UnitRegistry(DEFAULT_UNIT_DEFINITIONS,
+                        cache_folder=wf.cachefile('pint'))
+    ureg.formatter.default_format = 'P'
 
     wf.magic_arguments['appkey'] = open_currency_instructions
 
@@ -652,13 +641,6 @@ def main(wf):
     # Add workflow and user units to unit registry
     register_units()
 
-    # Notify of available update
-    if wf.update_available:
-        wf.add_item('A newer version is available',
-                    'Action this item to download & install the new version',
-                    autocomplete='workflow:update',
-                    icon=ICON_UPDATE)
-
     # Load cached data
     exchange_rates = wf.cached_data(CURRENCY_CACHE_NAME, max_age=0)
 
@@ -667,7 +649,7 @@ def main(wf):
 
     if not wf.cached_data_fresh(CURRENCY_CACHE_NAME, CURRENCY_CACHE_AGE):
         # Update currency rates
-        cmd = ['/usr/bin/python', wf.workflowfile('currency.py')]
+        cmd = [sys.executable, wf.workflowfile('currency.py')]
         run_in_background('update', cmd)
         wf.rerun = 0.5
 
@@ -685,8 +667,6 @@ def main(wf):
 
 
 if __name__ == '__main__':
-    wf = Workflow3(update_settings=UPDATE_SETTINGS,
-                   default_settings=DEFAULT_SETTINGS,
-                   help_url=HELP_URL)
+    wf = Workflow(default_settings=DEFAULT_SETTINGS, help_url=HELP_URL)
     log = wf.logger
     sys.exit(wf.run(main))
