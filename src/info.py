@@ -123,7 +123,7 @@ def handle_delimited_query(query):
         # subprocess.call(['osascript', '-e', ALFRED_AS])
         # return
 
-    mode, query = [s.strip() for s in query.split(DELIMITER)]
+    mode, query = [s.strip() for s in query.split(DELIMITER, 1)]
 
     if mode == 'currencies':
 

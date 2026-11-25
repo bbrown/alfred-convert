@@ -14,9 +14,9 @@ from __future__ import print_function, absolute_import
 
 from collections import namedtuple
 import logging
+import time
 
 import pytest
-from workflow import Workflow
 
 import convert
 from defaults import Defaults
@@ -31,6 +31,31 @@ convert.ureg.formatter.default_format = 'P'
 
 T = namedtuple('T', 'number dimensionality from_unit to_unit')
 C = namedtuple('C', 'from_number from_unit to_number to_unit dimensionality')
+
+
+class FakeWorkflow(object):
+    """Just enough of `workflow.Workflow`, with settings and cache in memory."""
+
+    def __init__(self, tmp_path=None):
+        self.dir = tmp_path
+        self.settings = {}
+        self.saved = {}  # cache name -> time saved
+        self.rerun = 0
+
+    def cachefile(self, name):
+        return str(self.dir / name)
+
+    def cache_data(self, name, data):
+        if data is None:
+            self.saved.pop(name, None)
+        else:
+            self.saved[name] = time.time()
+
+    def cached_data_fresh(self, name, max_age):
+        return time.time() - self.saved.get(name, 0) < max_age
+
+    def workflowfile(self, name):
+        return name
 
 
 def verify_parsed(t1, t2):
@@ -72,6 +97,9 @@ def test_valid():
         ('5 m/s kph', T(5.0, '[length] / [time]', 'meter/second',
                         'kilometer_per_hour')),
         ('21.3 m^2 acres', T(21.3, '[length] ** 2', u'meter²', 'acre')),
+        ('+5km m', T(5.0, '[length]', 'kilometer', 'meter')),
+        ('20 degC degF', T(20.0, '[temperature]', 'degree_Celsius',
+                           'degree_Fahrenheit')),
     ]
     c = convert.Converter(None)
     for t in data:
@@ -102,13 +130,12 @@ def test_defaults():
             C(100, 'gram', 100000, 'milligram', '[mass]')]),
     ]
 
-    wf = Workflow()
-    if 'default_units' not in wf.settings:
-        wf.settings['default_units'] = {}
-
-    wf.settings['default_units']['[length]'] = ['centimeter', 'kilometer']
-    wf.settings['default_units']['[mass]'] = ['kilogram', 'milligram']
-
+    wf = FakeWorkflow()
+    wf.settings['default_units'] = {
+        '[length]': ['centimeter', 'kilometer'],
+        '[mass]': ['kilogram', 'milligram'],
+        '[temperature]': ['degF'],
+    }
     c = convert.Converter(Defaults(wf))
 
     for t in data:
@@ -119,27 +146,77 @@ def test_defaults():
             log.debug(r)
             verify_conversion(t[1][j], r)
 
+    # Pint calls degF "degree_Fahrenheit": still don't convert it to itself
+    with pytest.raises(convert.NoToUnits):
+        c.convert(c.parse('100 degF'))
+
+
+def test_formatter():
+    """Dynamic decimals work the same for negative numbers."""
+    f = convert.Formatter(2, '.', ',', True)
+    assert f.formatted(-1234.5) == '-1,234.50'
+    assert f.formatted(-0.004) == '-0.004'
+    assert f.formatted(0.004) == '0.004'
+
+
+def test_bad_currency_symbols_are_skipped(monkeypatch):
+    """One bad exchange rate doesn't stop the others from loading."""
+    monkeypatch.setattr(convert, 'ureg',
+                        convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS))
+    convert.register_exchange_rates(
+        {'STR*': 2.0, '1ST': 3.0, 'ZZZ': 'Error', 'EUR': 0.5})
+    assert convert.ureg.Quantity(1, 'EUR').to('usd').magnitude == 2.0
+
+
+def test_currency_error_names_missing_key(monkeypatch):
+    """Unknown currencies say which API key would add them."""
+    shown = []
+    monkeypatch.setattr(convert, 'show_currency_help', shown.append)
+    monkeypatch.setattr(convert, 'is_running', lambda name: False)
+    monkeypatch.setattr(convert, 'CRYPTO_API_KEY', None)
+    for unit in ('eth', 'btc', 'zmw'):
+        with pytest.raises(SystemExit):
+            convert.error_if_currency(unit)
+    assert shown == ['CRYPTO_API_KEY', 'CRYPTO_API_KEY', 'APP_KEY']
+
+    convert.error_if_currency('furlong')  # not a currency
+    monkeypatch.setattr(convert, 'is_running', lambda name: True)
+    convert.error_if_currency('eth')  # rates are still downloading
+    assert len(shown) == 3
+
 
 def test_rate_sources_change_clears_cache(tmp_path, monkeypatch):
     """Setting or removing an API key clears cached exchange rates."""
-    cleared = []
-
-    class FakeWorkflow(object):
-        def cachefile(self, name):
-            return str(tmp_path / name)
-
-        def cache_data(self, name, data):
-            cleared.append((name, data))
-
-    wf = FakeWorkflow()
+    wf = FakeWorkflow(tmp_path)
     monkeypatch.setattr(convert, 'CRYPTO_API_KEY', None)
-    convert.handle_update(wf)  # no record of previous sources
+    convert.handle_update(wf)  # no record of previous sources yet
+    wf.cache_data('exchange_rates', {})
     convert.handle_update(wf)  # unchanged
-    assert cleared == [('exchange_rates', None)]
+    assert 'exchange_rates' in wf.saved
 
     monkeypatch.setattr(convert, 'CRYPTO_API_KEY', 'key')
     convert.handle_update(wf)
-    assert len(cleared) == 2
+    assert 'exchange_rates' not in wf.saved
+
+
+def test_failed_update_waits_before_retrying(monkeypatch):
+    """Offline, don't start a new download on every keystroke."""
+    started = []
+    monkeypatch.setattr(convert, 'run_in_background',
+                        lambda name, cmd: started.append(cmd))
+    wf = FakeWorkflow()
+    convert.start_update(wf)
+    convert.start_update(wf)  # first download failed: rates still stale
+    assert len(started) == 1
+
+    wf.saved['rates_attempt'] -= convert.RETRY_DELAY
+    convert.start_update(wf)
+    assert len(started) == 2
+
+    wf.cache_data('exchange_rates', {})  # rates are fresh: nothing to do
+    wf.saved['rates_attempt'] -= convert.RETRY_DELAY
+    convert.start_update(wf)
+    assert len(started) == 2
 
 
 if __name__ == '__main__':  # pragma: no cover

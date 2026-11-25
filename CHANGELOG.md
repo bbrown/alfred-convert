@@ -11,6 +11,13 @@ Unreleased
 - Some units now display with Pint's current names, e.g. `kph` → `kilometer_per_hour`, `degF` → `degree_Fahrenheit`
 - Cryptocurrency rates require a CryptoCompare API key (`CRYPTO_API_KEY`, optional). Without it, crypto rates are skipped instead of breaking all currency updates
 - Remove update checks against the archived upstream repo
+- Fix: negative results no longer show 10 decimal places
+- Fix: a leading `+` (e.g. `+5km m`) no longer swallows the first letter of the unit
+- Fix: Bitcoin converts with only `CRYPTO_API_KEY` set
+- Fix: a currency symbol Pint can't use (e.g. `STR*`) is skipped instead of breaking every conversion
+- Fix: when offline, wait 5 minutes between exchange rate download attempts
+- Unknown currencies say which API key adds them, and nothing while rates are downloading
+- Help links open this fork's README and issues
 
 
 ### [3.7.0][v3.7.0] ###

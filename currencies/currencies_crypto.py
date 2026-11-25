@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
@@ -16,14 +16,16 @@ from __future__ import print_function, absolute_import
 
 from collections import namedtuple
 import csv
-from itertools import izip_longest
+from itertools import zip_longest
 import os
 import requests
+import sys
 from time import sleep
 
 reference_currency = 'USD'
+api_key = None
 
-all_currencies_url = 'https://www.cryptocompare.com/api/data/coinlist/'
+all_currencies_url = 'https://min-api.cryptocompare.com/data/all/coinlist'
 base_url = 'https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}'
 
 crypto_currencies_file = os.path.join(os.path.dirname(__file__),
@@ -48,14 +50,15 @@ def grouper(n, iterable):
     sentinel = object()
     args = [iter(iterable)] * n
     groups = []
-    for l in izip_longest(*args, fillvalue=sentinel):
+    for l in zip_longest(*args, fillvalue=sentinel):
         groups.append([v for v in l if v is not sentinel])
     return groups
 
 
 def main():
     """Generate list of cryptocurrencies with exchange rates."""
-    r = requests.get(all_currencies_url)
+    headers = {'Authorization': 'Apikey ' + api_key}
+    r = requests.get(all_currencies_url, headers=headers)
     r.raise_for_status()
     data = r.json()
     all_currencies = []
@@ -70,7 +73,7 @@ def main():
     for currencies in grouper(20, all_currencies):
         url = base_url.format(reference_currency,
                               ','.join([c.symbol for c in currencies]))
-        r = requests.get(url)
+        r = requests.get(url, headers=headers)
         r.raise_for_status()
         data = r.json()
         for c in currencies:
@@ -84,12 +87,15 @@ def main():
         sleep(0.3)
 
     # valid = [c for c in all_currencies if c.symbol not in invalid]
-    with open(crypto_currencies_file, 'wb') as fp:
+    with open(crypto_currencies_file, 'w', newline='', encoding='utf-8') as fp:
         w = csv.writer(fp, delimiter='\t')
         for c in sorted(valid, key=lambda t: t.symbol):
-            r = [c.symbol.encode('utf-8'), c.name.encode('utf-8')]
-            w.writerow(r)
+            w.writerow([c.symbol, c.name])
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: currencies_crypto.py <CRYPTO_API_KEY>')
+        sys.exit(1)
+    api_key = sys.argv[1]
     main()

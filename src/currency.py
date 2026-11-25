@@ -207,9 +207,10 @@ def fetch_exchange_rates():
         jobs = [(load_openx_rates, (syms,))]
 
     syms = []
-    for s in CRYPTO_CURRENCIES.keys():
-        if s in CURRENCIES:
-            log.warning('ignoring crytopcurrency "%s", as it conflicts with '
+    for s, name in CRYPTO_CURRENCIES.items():
+        # Same symbol, different currency (e.g. XPD); BTC is in both lists
+        if CURRENCIES.get(s, name) != name:
+            log.warning('ignoring cryptocurrency "%s", as it conflicts with '
                         'a fiat currency', s)
             continue
         if s in active:

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
@@ -57,10 +57,8 @@ def load_currencies(*filepaths):
     """
     currencies = {}
     for filepath in filepaths:
-        with open(filepath, 'rb') as fp:
-            reader = csv.reader(fp, delimiter=b'\t')
-            for row in reader:
-                symbol, name = [unicode(s, 'utf-8') for s in row]
+        with open(filepath, newline='', encoding='utf-8') as fp:
+            for symbol, name in csv.reader(fp, delimiter='\t'):
                 currencies[symbol] = name
 
     return currencies
@@ -117,12 +115,10 @@ def main():
     supported_currencies = {k: v for k, v in all_currencies.items()
                             if k not in unknown_currencies}
 
-    with open(openx_currencies_file, 'wb') as fp:
-        w = csv.writer(fp, delimiter=b'\t')
+    with open(openx_currencies_file, 'w', newline='', encoding='utf-8') as fp:
+        w = csv.writer(fp, delimiter='\t')
         for sym in sorted(supported_currencies):
-            name = supported_currencies[sym]
-            r = [sym.encode('utf-8'), name.encode('utf-8')]
-            w.writerow(r)
+            w.writerow([sym, supported_currencies[sym]])
 
 
 if __name__ == '__main__':

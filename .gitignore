@@ -1,5 +1,9 @@
 /build
 .cache
+# Built workflows: attach to GitHub releases instead
+*.alfredworkflow
+# Vendored libraries' own tests (re-added by `pip install --target src`)
+src/*/testsuite/
 
 # Python snippets from gitignore on github
 

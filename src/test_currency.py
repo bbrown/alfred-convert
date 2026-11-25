@@ -31,7 +31,8 @@ class FakeResponse(object):
 def test_crypto_rates_are_optional(monkeypatch):
     """Crypto rates need CRYPTO_API_KEY, and failing never loses fiat rates."""
     headers_sent = {}
-    crypto = {'ETH': 0.0003, 'Response': 'Error'}  # junk keys must be dropped
+    # Junk keys must be dropped, and XPD (palladium as fiat) never requested
+    crypto = {'ETH': 0.0003, 'BTC': 0.00001, 'XPD': 1.0, 'Response': 'Error'}
 
     def fake_get(url, headers=None, **kwargs):
         if 'cryptocompare' not in url:
@@ -43,7 +44,7 @@ def test_crypto_rates_are_optional(monkeypatch):
 
     monkeypatch.setattr(currency.web, 'get', fake_get)
     monkeypatch.setattr(currency, 'load_active_currencies',
-                        lambda: {'EUR', 'ETH'})
+                        lambda: {'EUR', 'ETH', 'BTC', 'XPD'})
     monkeypatch.setattr(currency, 'OPENX_APP_KEY', None)
 
     monkeypatch.setattr(currency, 'CRYPTO_API_KEY', None)
@@ -51,7 +52,9 @@ def test_crypto_rates_are_optional(monkeypatch):
     assert not headers_sent  # CryptoCompare not even called
 
     monkeypatch.setattr(currency, 'CRYPTO_API_KEY', 'secret')
-    assert currency.fetch_exchange_rates() == {'EUR': 0.9, 'ETH': 0.0003}
+    # BTC is also in the fiat list, but the free fiat source doesn't have it
+    assert currency.fetch_exchange_rates() == {'EUR': 0.9, 'ETH': 0.0003,
+                                               'BTC': 0.00001}
     assert headers_sent['Authorization'] == 'Apikey secret'
 
     crypto = IOError('HTTP Error 401: Unauthorized')  # e.g. a bad key

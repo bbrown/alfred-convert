@@ -210,9 +210,9 @@ All other code/media are released under the [MIT Licence][mit].
 [changelog]: ./CHANGELOG.md
 [demo]: https://raw.github.com/deanishe/alfred-convert/master/demo.gif
 [fontawesome]: http://fortawesome.github.io/Font-Awesome/
-[ghissues]: https://github.com/deanishe/alfred-convert/issues
-[ghpulls]: https://github.com/deanishe/alfred-convert/pulls
-[ghreleases]: https://github.com/deanishe/alfred-convert/releases
+[ghissues]: https://github.com/bbrown/alfred-convert/issues
+[ghpulls]: https://github.com/bbrown/alfred-convert/pulls
+[ghreleases]: https://github.com/bbrown/alfred-convert/releases
 [mit]: http://opensource.org/licenses/MIT
 [pintdocs]: http://pint.readthedocs.org/en/latest/index.html
 [pinthowto]: http://pint.readthedocs.org/en/latest/defining.html

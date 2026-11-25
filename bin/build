@@ -97,6 +97,8 @@ rsync --archive $vopt \
   -f '- *.egg-info' \
   -f '- *.dist-info' \
   -f '- __pycache__' \
+  -f '- testsuite' \
+  -f '- test_*.py' \
   "$srcdir/" "$builddir/"
 success "copied workflow source to builddir"
 

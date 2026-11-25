@@ -14,6 +14,7 @@ from __future__ import print_function
 
 import os
 import sys
+import time
 
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
@@ -25,6 +26,8 @@ from config import (
     BUILTIN_UNIT_DEFINITIONS,
     COPY_UNIT,
     CRYPTO_API_KEY,
+    CRYPTO_CURRENCIES,
+    CURRENCIES,
     CURRENCY_CACHE_AGE,
     CURRENCY_CACHE_NAME,
     CURRENCY_DECIMAL_PLACES,
@@ -42,42 +45,44 @@ from defaults import Defaults
 
 log = None
 
+# When the last exchange rate download was started
+ATTEMPT_CACHE_NAME = 'rates_attempt'
+RETRY_DELAY = 300  # seconds
+
 # Pint objects
 ureg = None
 # Q = ureg.Quantity
 
 
-def unit_is_currency(unit):
-    """Return ``True`` if specified unit is a fiat currency."""
-    from config import CURRENCIES
-    return unit.upper() in CURRENCIES
-
-
 def open_currency_instructions():
     """Magic action to open help in browser."""
     import webbrowser
-    webbrowser.open('https://github.com/deanishe/alfred-convert#conversions')
+    webbrowser.open('https://github.com/bbrown/alfred-convert#conversions')
     return 'Opening instructions in browser...'
 
 
 def error_if_currency(unit):
-    """Show an error currency conversion isn't set up.
+    """Show which API key is needed if ``unit`` is an unavailable currency."""
+    if is_running('update'):  # rates may just not be downloaded yet
+        return
 
-    Detect whether input is a currency, and show an error if it is and
-    there's no API key for exchange rates.
-    """
-    if unit_is_currency(unit):
-        log.error(
-            "[parser] unit %s is a fiat currency, but OpenExchangeRates.org "
-            "API key isn't set", unit)
+    unit = unit.upper()
+    if unit in CRYPTO_CURRENCIES and not CRYPTO_API_KEY:
+        key = 'CRYPTO_API_KEY'
+    elif unit in CURRENCIES:
+        key = 'APP_KEY'
+    else:
+        return
 
-        show_currency_help()
-        sys.exit(0)
+    log.error('[parser] unit %s is a currency without rates: set %s',
+              unit, key)
+    show_currency_help(key)
+    sys.exit(0)
 
 
-def show_currency_help():
-    """Show a message in Alfred telling user to set ``APP_KEY``."""
-    wf.add_item('Set APP_KEY to convert this currency',
+def show_currency_help(key):
+    """Show a message in Alfred telling user to set API key ``key``."""
+    wf.add_item('Set {} to convert this currency'.format(key),
                 'Action this item for instructions',
                 autocomplete='workflow:appkey',
                 icon=ICON_WARNING)
@@ -101,9 +106,27 @@ def handle_update(wf):
                 return
 
     wf.cache_data(CURRENCY_CACHE_NAME, None)
+    wf.cache_data(ATTEMPT_CACHE_NAME, None)  # fetch now, don't wait to retry
     with open(path, 'w') as fp:
         fp.write(sources)
     log.debug('cleared cached exchange rates: sources are now %s', sources)
+
+
+def start_update(wf):
+    """Fetch exchange rates in the background if they're out of date.
+
+    A failed download (e.g. offline) leaves the rates out of date, so
+    only try again after ``RETRY_DELAY`` seconds.
+
+    """
+    if (wf.cached_data_fresh(CURRENCY_CACHE_NAME, CURRENCY_CACHE_AGE) or
+            wf.cached_data_fresh(ATTEMPT_CACHE_NAME, RETRY_DELAY)):
+        return
+
+    wf.cache_data(ATTEMPT_CACHE_NAME, time.time())
+    run_in_background('update', [sys.executable,
+                                 wf.workflowfile('currency.py')])
+    wf.rerun = 0.5
 
 
 class NoToUnits(Exception):
@@ -181,7 +204,7 @@ class Formatter(object):
             e = 10 ** p
             i = n * e
             # log.debug('n=%r, e=%d, i=%r, p=%d', n, e, i, p)
-            if n * e >= 10:
+            if abs(i) >= 10:
                 break
 
             p += 1
@@ -317,11 +340,7 @@ class Converter(object):
         if i.to_unit is not None:
             units = [i.to_unit]
         else:
-            units = [u for u in self.defaults.defaults(i.dimensionality)
-                     if u != i.from_unit]
-
-        if not units:
-            raise NoToUnits()
+            units = self.defaults.defaults(i.dimensionality)
 
         results = []
         qty = ureg.Quantity(i.number, i.from_unit)
@@ -332,10 +351,18 @@ class Converter(object):
                 error_if_currency(u)
                 raise ValueError('Unknown unit: {}'.format(u))
 
+            # Skip defaults that are the input unit under another name,
+            # e.g. a saved "degF" when the input is "degree_Fahrenheit"
+            if i.to_unit is None and to_unit.units == qty.units:
+                continue
+
             conv = qty.to(to_unit)
             log.debug('[convert] %s -> %s = %s', i.from_unit, u, conv)
             results.append(Conversion(i.number, i.from_unit,
                                       conv.magnitude, u, i.dimensionality))
+
+        if not results:
+            raise NoToUnits()
 
         return results
 
@@ -372,7 +399,7 @@ class Converter(object):
 
         # Create `Input` from parsed query
         tu = None
-        if to_unit:
+        if to_unit is not None:  # Pint can't bool() temperatures
             tu = str(to_unit.units)
         i = Input(from_unit.magnitude, str(from_unit.dimensionality),
                   str(from_unit.units), tu, ctx)
@@ -430,7 +457,7 @@ class Converter(object):
             if c in qtychars:
                 if c == '+':
                     qty.append('')
-                if c == self.thousands_separator:
+                elif c == self.thousands_separator:
                     log.debug('ignored thousands separator "%s"', c)
                     # Append an empty string so qty length is correct
                     qty.append('')
@@ -516,6 +543,10 @@ def register_exchange_rates(exchange_rates):
     ureg.define('USD = [currency] = usd')
 
     for abbr, rate in exchange_rates.items():
+        if not abbr.isidentifier():  # Pint unit names, e.g. not "STR*"
+            log.warning('skipping currency %r : not a valid unit name', abbr)
+            continue
+
         definition = '{} = usd / {}'.format(abbr, rate)
 
         try:
@@ -532,7 +563,10 @@ def register_exchange_rates(exchange_rates):
             definition += ' = {}'.format(abbr.lower())
 
         log.debug('registering currency : %r', definition)
-        ureg.define(definition)
+        try:
+            ureg.define(definition)
+        except Exception as err:  # one bad rate mustn't break all conversions
+            log.error('skipping currency %r : %s', definition, err)
 
 
 def convert(query):
@@ -647,11 +681,7 @@ def main(wf):
     if exchange_rates:  # Add exchange rates to conversion database
         register_exchange_rates(exchange_rates)
 
-    if not wf.cached_data_fresh(CURRENCY_CACHE_NAME, CURRENCY_CACHE_AGE):
-        # Update currency rates
-        cmd = [sys.executable, wf.workflowfile('currency.py')]
-        run_in_background('update', cmd)
-        wf.rerun = 0.5
+    start_update(wf)
 
     if is_running('update'):
         wf.rerun = 0.5

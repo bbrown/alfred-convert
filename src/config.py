@@ -1742,8 +1742,8 @@ CRYPTO_CURRENCIES = {
 # ----------------------------------------------------------------------
 # Help/support URLs
 # ----------------------------------------------------------------------
-HELP_URL = 'https://github.com/deanishe/alfred-convert/issues'
-README_URL = 'https://github.com/deanishe/alfred-convert#alfred-convert'
+HELP_URL = 'https://github.com/bbrown/alfred-convert/issues'
+README_URL = 'https://github.com/bbrown/alfred-convert#alfred-convert'
 
 # ----------------------------------------------------------------------
 # Icons
