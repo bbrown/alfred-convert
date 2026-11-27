@@ -224,9 +224,10 @@ conv 20 °C °F                    → 68.00 °F
 conv 20 celsius fahrenheit       → 68.00 °F
 conv 300 K degC                  → 26.85 °C
 conv 10 delta_degC delta_degF    → 18.00 Δ°F
+conv 80 degRe degC               → 100.00 °C
 ```
 
-Write degrees as `degC`, `°C` or `celsius`, and the same way for Fahrenheit. `K` is kelvin. These convert a temperature from one scale to another. To convert a change in temperature, such as a rise of 10 °C, use `delta_degC` and `delta_degF`. A temperature below absolute zero still converts, but the result's subtitle points out that it's colder than physics allows.
+Write degrees as `degC`, `°C` or `celsius`, and the same way for Fahrenheit. `K` is kelvin, and `degRe` the Réaumur scale, on which water boils at 80°. These convert a temperature from one scale to another. To convert a change in temperature, such as a rise of 10 °C, use `delta_degC` and `delta_degF`. A temperature below absolute zero still converts, but the result's subtitle points out that it's colder than physics allows.
 
 
 Speed and pace
