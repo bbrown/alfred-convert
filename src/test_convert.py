@@ -220,6 +220,25 @@ def test_defaults():
         c.convert(c.parse('100 degF'))
 
 
+def test_starter_defaults():
+    """Common dimensionalities have defaults until the user saves some."""
+    wf = FakeWorkflow()
+    defs = Defaults(wf)
+    assert defs.defaults('[mass]') == ['gram', 'kilogram', 'ounce', 'pound']
+    defs.remove('[mass]', 'ounce')
+    assert Defaults(wf).defaults('[mass]') == ['gram', 'kilogram', 'pound']
+    for unit in ('gram', 'kilogram', 'pound'):
+        defs.remove('[mass]', unit)
+    assert Defaults(wf).defaults('[mass]') == []  # starters don't return
+    assert Defaults(FakeWorkflow()).defaults('[mass]') == [
+        'gram', 'kilogram', 'ounce', 'pound']
+
+    # A default that's gone, e.g. a deleted custom unit, is skipped
+    wf.settings['default_units'] = {'[length]': ['furlongz', 'meter']}
+    c = convert.Converter(Defaults(wf))
+    assert [r.to_unit for r in c.convert(c.parse('1 km'))] == ['meter']
+
+
 def test_formatter():
     """Dynamic decimals show 2 significant digits, negative numbers too."""
     f = convert.Formatter(2, '.', ',', dynamic_decimals=True)

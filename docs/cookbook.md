@@ -384,10 +384,18 @@ conv 100 usd              → 92.00 EUR
                           → 79.00 GBP
 conv 100 eur              → 85.87 GBP
 conv 20 degC              → 68.00 °F
-conv 5 kg                 → No destination units (or defaults) for [mass]
 ```
 
-The workflow skips a default that's the same as the unit you convert from, so `100 eur` only shows pounds. With no defaults for a dimensionality, it says so.
+The workflow skips a default that's the same as the unit you convert from, so `100 eur` only shows pounds.
+
+Until you save your own, the workflow has defaults for length, mass, temperature, area, volume, speed, time and currency, in metric and US units. With no defaults for a dimensionality, it says so:
+
+```text
+conv 5 kg                 → 5,000.00 g
+                          → 176.37 oz
+                          → 11.02 lb
+conv 1 g/cm^3             → No destination units (or defaults) for [mass] / [length] ** 3
+```
 
 
 Contexts

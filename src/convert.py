@@ -348,7 +348,12 @@ class Converter:
         for u in units:
             # Mixed units such as "foot+inch" convert to the last one.
             # Magnitude 0.01 for "l/100km".
-            to_unit = quantity(1, u.split('+')[-1])
+            try:
+                to_unit = quantity(1, u.split('+')[-1])
+            except ValueError:
+                if i.to_units:
+                    raise
+                continue  # a default that's gone, e.g. an inactive currency
 
             # Skip defaults that are the input unit under another name,
             # e.g. a saved "degF" when the input is "degree_Fahrenheit"

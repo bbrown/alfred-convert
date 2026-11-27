@@ -20,6 +20,19 @@ from workflow import Workflow
 
 log = None
 
+# Defaults for a dimensionality the user hasn't saved any for, in Pint's
+# names for the units, as saved defaults are
+STARTER_DEFAULTS = {
+    '[length]': ['centimeter', 'meter', 'kilometer', 'inch', 'foot', 'mile'],
+    '[mass]': ['gram', 'kilogram', 'ounce', 'pound'],
+    '[temperature]': ['degree_Celsius', 'degree_Fahrenheit'],
+    '[length] ** 2': ['meter²', 'hectare', 'foot²', 'acre'],
+    '[length] ** 3': ['milliliter', 'liter', 'fluid_ounce', 'cup', 'gallon'],
+    '[length] / [time]': ['kilometer_per_hour', 'mile_per_hour'],
+    '[time]': ['second', 'minute', 'hour', 'day'],
+    '[currency]': ['USD', 'EUR'],
+}
+
 
 class Defaults:
     """Manage default units for dimensionalities.
@@ -87,7 +100,9 @@ class Defaults:
         return unit in self._defs[dimensionality]
 
     def _load(self):
-        defs = defaultdict(list)
+        # Copies, so saving a change doesn't change STARTER_DEFAULTS
+        defs = defaultdict(list, {dim: units[:] for dim, units
+                                  in STARTER_DEFAULTS.items()})
         defs.update(self._wf.settings.get('default_units', {}))
         return defs
 

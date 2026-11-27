@@ -42,7 +42,7 @@ Type `conv`, a number and a unit. To convert to a particular unit, add it at the
 
 The [cookbook](./docs/cookbook.md) has many more examples, with tips for writing numbers and units.
 
-If you leave out the unit to convert to, the workflow uses your default units for that dimensionality, such as length or mass. To save a default, select a result and press `⌘↩`.
+If you leave out the unit to convert to, the workflow uses your default units for that dimensionality, such as length or mass. To save a default, select a result and press `⌘↩`. Until you save your own, the workflow uses metric and US units for common dimensionalities.
 
 Some conversions only work in a [Pint context][pintcontexts]. Put the context's name or short name first: `conv spectroscopy 1Å eV` or `conv sp 1Å eV`.
 
