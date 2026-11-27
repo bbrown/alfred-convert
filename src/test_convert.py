@@ -63,6 +63,9 @@ def test_invalid():
         '1.3',  # no unit
         '5 daves',  # invalid units
         '10 km m cm',  # too many units
+        '-',  # half-typed: "-40 degC degF"
+        '20.5 m/',  # half-typed: "20.5 m/s kph"
+        '1 m)',
     ]
     c = convert.Converter(None)
     for query in queries:

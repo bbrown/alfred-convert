@@ -15,8 +15,10 @@ from __future__ import print_function
 from collections import namedtuple
 import os
 import sys
+from tokenize import TokenError
 
-from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
+from pint import (UnitRegistry, UndefinedUnitError, DimensionalityError,
+                  DefinitionSyntaxError)
 
 from workflow import Workflow, ICON_WARNING, ICON_INFO
 from workflow.background import run_in_background, is_running
@@ -202,6 +204,22 @@ Conversion = namedtuple(
     'Conversion', 'from_number from_unit to_number to_unit dimensionality')
 
 
+def quantity(number, unit):
+    """Return ``ureg.Quantity(number, unit)``.
+
+    Raises:
+        ValueError: Raised if ``unit`` is unknown or half-typed, e.g. "m/".
+
+    """
+    try:
+        return ureg.Quantity(number, unit)
+    # Pint's parser raises the others on half-typed units, e.g. "m/" or "m)"
+    except (UndefinedUnitError, AssertionError, TokenError,
+            DefinitionSyntaxError):
+        error_if_currency(unit)
+        raise ValueError('Unknown unit: {}'.format(unit))
+
+
 class Converter(object):
     """Parse query and convert.
 
@@ -254,11 +272,7 @@ class Converter(object):
         results = []
         qty = ureg.Quantity(i.number, i.from_unit)
         for u in units:
-            try:
-                to_unit = ureg.Quantity(1, u)
-            except UndefinedUnitError:
-                error_if_currency(u)
-                raise ValueError('Unknown unit: {}'.format(u))
+            to_unit = quantity(1, u)
 
             # Skip defaults that are the input unit under another name,
             # e.g. a saved "degF" when the input is "degree_Fahrenheit"
@@ -357,7 +371,8 @@ class Converter(object):
             query (str): (Partial) user query
 
         Returns:
-            (float, str): Quantity and remainder of query
+            (float, str): Quantity and remainder of query, or
+                ``(None, '')`` if the query doesn't start with a number.
 
         """
         qty = []
@@ -377,13 +392,11 @@ class Converter(object):
                     qty.append(c)
             else:
                 break
-        if not len(qty):
+
+        try:
+            return float(''.join(qty)), query[len(qty):].strip()
+        except ValueError:  # no number, or half of one, e.g. "-" or "1.2."
             return None, ''
-
-        tail = query[len(qty):].strip()
-        qty = float(''.join(qty))
-
-        return qty, tail
 
     def parse_units(self, query, qty=1):
         """Extract from and (optional) to units from query.
@@ -413,18 +426,9 @@ class Converter(object):
             raise ValueError('More than 2 units specified')
 
         # Validate units
-        try:
-            from_unit = ureg.Quantity(qty, from_unit)
-        except UndefinedUnitError:
-            error_if_currency(from_unit)
-            raise ValueError('Unknown unit: ' + from_unit)
-
+        from_unit = quantity(qty, from_unit)
         if to_unit:
-            try:
-                to_unit = ureg.Quantity(1, to_unit)
-            except UndefinedUnitError:
-                error_if_currency(to_unit)
-                raise ValueError('Unknown unit: ' + to_unit)
+            to_unit = quantity(1, to_unit)
 
         return from_unit, to_unit
 
