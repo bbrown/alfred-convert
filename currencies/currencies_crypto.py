@@ -18,9 +18,13 @@ from collections import namedtuple
 import csv
 from itertools import zip_longest
 import os
-import requests
 import sys
 from time import sleep
+
+here = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.join(here, '..', 'src'))
+
+from workflow import web  # noqa: E402
 
 reference_currency = 'USD'
 api_key = None
@@ -28,8 +32,7 @@ api_key = None
 all_currencies_url = 'https://min-api.cryptocompare.com/data/all/coinlist'
 base_url = 'https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}'
 
-crypto_currencies_file = os.path.join(os.path.dirname(__file__),
-                                      'currencies_crypto.tsv')
+crypto_currencies_file = os.path.join(here, 'currencies_crypto.tsv')
 
 
 Currency = namedtuple('Currency', 'symbol name')
@@ -58,7 +61,7 @@ def grouper(n, iterable):
 def main():
     """Generate list of cryptocurrencies with exchange rates."""
     headers = {'Authorization': 'Apikey ' + api_key}
-    r = requests.get(all_currencies_url, headers=headers)
+    r = web.get(all_currencies_url, headers=headers)
     r.raise_for_status()
     data = r.json()
     all_currencies = []
@@ -74,7 +77,7 @@ def main():
     for currencies in grouper(20, all_currencies):
         url = base_url.format(reference_currency,
                               ','.join([c.symbol for c in currencies]))
-        r = requests.get(url, headers=headers)
+        r = web.get(url, headers=headers)
         r.raise_for_status()
         data = r.json()
         for c in currencies:
