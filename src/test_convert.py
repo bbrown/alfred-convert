@@ -88,6 +88,23 @@ def test_valid():
         assert c.parse(t[0])[:4] == t[1]  # all fields but context
 
 
+def test_number_formats():
+    """Scientific notation, fractions and the web's minus sign "−"."""
+    c = convert.Converter(None)
+    for query, number, rest in [
+            ('1e3 m', 1000, 'm'),
+            ('1.5E-6m', 1.5e-6, 'm'),
+            ('−40 degC', -40, 'degC'),
+            ('1/2 cup', 0.5, 'cup'),
+            ('1 1/2 cups', 1.5, 'cups'),
+            ('½ cup', 0.5, 'cup'),
+            ('-1½cup', -1.5, 'cup'),
+            ('2 ¾ cup', 2.75, 'cup'),
+            ('1e C', 1, 'e C'),  # 1 elementary charge
+            ('3/0 m', 3, '/0 m')]:  # not a fraction
+        assert c.parse_quantity(query) == (number, rest)
+
+
 def test_thousands_separators():
     """A thousands separator needs 3 digits after it, so "1,5" isn't 15."""
     c = convert.Converter(None)

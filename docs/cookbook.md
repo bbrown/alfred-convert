@@ -80,7 +80,17 @@ A `,` needs 3 digits after it, so the workflow won't quietly read `1,5` as 15:
 conv 1,5 m cm             → Use "." for decimals and "," between thousands
 ```
 
-If you change `DECIMAL_SEPARATOR` or `THOUSANDS_SEPARATOR`, write numbers that way, e.g. `2,5` with a `,` decimal separator. There's no scientific notation: see [When something goes wrong](#when-something-goes-wrong).
+Fractions, vulgar fractions such as `½`, and scientific notation work too:
+
+```text
+conv 1/2 cup ml           → 118.29 ml
+conv 1 1/2 cups ml        → 354.88 ml
+conv 1½ cups ml           → 354.88 ml
+conv 1e3 m km             → 1.00 km
+conv 2.5e-6 m nm          → 2,500.00 nm
+```
+
+A minus sign copied from a web page (`−`) works like `-`. If you change `DECIMAL_SEPARATOR` or `THOUSANDS_SEPARATOR`, write numbers that way, e.g. `2,5` with a `,` decimal separator.
 
 
 Writing units
@@ -384,14 +394,12 @@ conv km m                 → Unknown context: km
 conv 3 furlongz m         → Unknown unit: furlongz
 conv 1 m s                → Can't convert from m [length] to s [time]
 conv 5 m / s kph          → More than 2 units specified
-conv 1e3 m km             → More than 2 units specified
 ```
 
 - A query must start with a number. The workflow reads lowercase letters before the number as a [context](#contexts) name.
 - If the workflow doesn't know a unit, check the spelling or look it up in Pint's [list of units][pintunits].
 - You can only convert between units of the same kind. The message shows each unit's dimensionality.
 - Don't put spaces inside a unit: write `m/s`.
-- There's no scientific notation, so `e3` is read as a unit. Use a prefix instead, such as `1 km` for 1e3 m.
 
 
 [pintcontexts]: https://pint.readthedocs.io/en/stable/user/contexts.html

@@ -14,6 +14,7 @@ import os
 import re
 import sys
 from tokenize import TokenError
+import unicodedata
 
 from pint import (UnitRegistry, UndefinedUnitError, DimensionalityError,
                   DefinitionSyntaxError)
@@ -127,6 +128,20 @@ def start_update(wf):
     wf.cache_data(CURRENCY_ATTEMPT_CACHE_NAME, True)
     run_in_background('update', [sys.executable,
                                  wf.workflowfile('currency.py')])
+
+
+VULGAR_FRACTIONS = '¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞'
+
+# Number at the start of a query. "−" is the minus sign web pages use.
+# {t} and {d} are the thousands and decimal separators.
+NUMBER = (
+    r'(?P<sign>[-+−]?)(?:'
+    r'(?:(?P<whole>\d+) +)?(?P<num>\d+)/(?P<den>[1-9]\d*)'  # 1/2, 1 1/2
+    r'|(?P<int>\d*) ?(?P<vulgar>[' + VULGAR_FRACTIONS + '])'  # ½, 1½
+    # 5, .5, 1,500.5, 1e-3: a digit first or after the decimal separator
+    r'|(?P<dec>(?={d}?\d)\d*(?:{t}\d{{3}}(?!\d))*(?:{d}\d*)?'
+    r'(?:[eE][-+−]?\d+)?))'
+)
 
 
 class NoToUnits(Exception):
@@ -383,9 +398,7 @@ class Converter:
         """
         t = self.thousands_separator
         d = self.decimal_separator
-        # A digit first or after the decimal separator: "5", ".5", "1,500.5"
-        m = re.match(r'[-+]?(?={d}?\d)\d*(?:{t}\d{{3}}(?!\d))*(?:{d}\d*)?'
-                     .format(t=re.escape(t), d=re.escape(d)), query)
+        m = re.match(NUMBER.format(t=re.escape(t), d=re.escape(d)), query)
         if not m:
             return None, ''
 
@@ -393,8 +406,16 @@ class Converter:
             raise ValueError('Use "{}" for decimals and "{}" between '
                              'thousands'.format(d, t))
 
-        number = m.group().replace(t, '').replace(d, '.')
-        return float(number), query[m.end():].strip()
+        if m['den']:
+            n = int(m['whole'] or 0) + int(m['num']) / int(m['den'])
+        elif m['vulgar']:
+            n = int(m['int'] or 0) + unicodedata.numeric(m['vulgar'])
+        else:
+            n = float(m['dec'].replace(t, '').replace(d, '.')
+                      .replace('−', '-'))
+        if m['sign'] in ('-', '−'):
+            n = -n
+        return n, query[m.end():].strip()
 
     def parse_units(self, query, qty=1):
         """Extract from and (optional) to units from query.
