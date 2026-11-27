@@ -12,6 +12,7 @@
 
 from __future__ import print_function
 
+from collections import namedtuple
 import os
 import sys
 
@@ -134,33 +135,8 @@ class NoToUnits(Exception):
     """Raised if there are no to units (or defaults)."""
 
 
-class Input(object):
-    """Parsed user query."""
-
-    def __init__(self, number, dimensionality, from_unit,
-                 to_unit=None, context=None):
-        """Create new ``Input``."""
-        self.number = number
-        self.dimensionality = dimensionality
-        self.from_unit = from_unit
-        self.to_unit = to_unit
-        self.context = context
-
-    @property
-    def is_currency(self):
-        """`True` if Input is a currency."""
-        return self.dimensionality == u'[currency]'
-
-    def __repr__(self):
-        """Code-like representation of `Input`."""
-        return ('Input(number={!r}, dimensionality={!r}, '
-                'from_unit={!r}, to_unit={!r})').format(
-                    self.number, self.dimensionality, self.from_unit,
-                    self.to_unit)
-
-    def __str__(self):
-        """Printable representation of `Input`."""
-        return self.__repr__()
+# Parsed user query
+Input = namedtuple('Input', 'number dimensionality from_unit to_unit context')
 
 
 class Formatter(object):
@@ -244,39 +220,9 @@ class Formatter(object):
         return num
 
 
-class Conversion(object):
-    """Results of a conversion.
-
-    Attributes:
-        dimensionality (str): Dimensionality of conversion
-        from_number (float): Input
-        from_unit (str): Unit of input
-        to_number (float): Conversion result
-        to_unit (str): Unit of output
-
-    """
-
-    def __init__(self, from_number, from_unit, to_number, to_unit,
-                 dimensionality):
-        """Create a new `Conversion`."""
-        self.from_number = from_number
-        self.from_unit = from_unit
-        self.to_number = to_number
-        self.to_unit = to_unit
-        self.dimensionality = dimensionality
-
-    def __str__(self):
-        """Pretty string representation."""
-        return u'{:f} {} = {:f} {} {}'.format(
-            self.from_number, self.from_unit, self.to_number, self.to_unit,
-            self.dimensionality)
-
-    def __repr__(self):
-        """Code-like representation."""
-        return ('Conversion(from_number={!r}, from_unit={!r}, '
-                'to_number={!r}, to_unit={!r}, dimensionality={!r}').format(
-                    self.from_number, self.from_unit, self.to_number,
-                    self.to_unit, self.dimensionality)
+# Result of converting an `Input` to one unit
+Conversion = namedtuple(
+    'Conversion', 'from_number from_unit to_number to_unit dimensionality')
 
 
 class Converter(object):
@@ -610,7 +556,8 @@ def convert(query):
                     valid=False, icon=ICON_WARNING)
 
     else:  # Show results
-        p = CURRENCY_DECIMAL_PLACES if i.is_currency else DECIMAL_PLACES
+        p = (CURRENCY_DECIMAL_PLACES if i.dimensionality == '[currency]'
+             else DECIMAL_PLACES)
         f = Formatter(p, DECIMAL_SEPARATOR, THOUSANDS_SEPARATOR,
                       DYNAMIC_DECIMALS)
         wf.setvar('query', query)
