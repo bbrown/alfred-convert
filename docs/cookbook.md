@@ -151,9 +151,11 @@ conv 70 in cm             → 177.80 cm
 conv 1 nmi km             → 1.85 km
 conv 1 au km              → 149,597,870.70 km
 conv 1 pc ly              → 3.26 ly
+conv 5 ft 10 in cm        → 177.80 cm
+conv 5'10" cm             → 177.80 cm
 ```
 
-`nmi` is a nautical mile, `au` an astronomical unit, `pc` a parsec and `ly` a light year. A query has only one unit to convert from, so for 5 ft 10 in, convert 70 in.
+`nmi` is a nautical mile, `au` an astronomical unit, `pc` a parsec and `ly` a light year. For feet and inches, write both, or use `'` and `"`, as in the last two lines.
 
 
 Area
@@ -242,9 +244,10 @@ conv 2.5 h min            → 150.00 min
 conv 3 weeks days         → 21.00 d
 conv 1 year days          → 365.25 d
 conv 1 century years      → 100.00 yr
+conv 1h30min min          → 90.00 min
 ```
 
-A `year` is 365.25 days.
+A `year` is 365.25 days. Mixed times work too, but write minutes as `min`: `m` is a metre.
 
 
 Data and transfer rates
@@ -415,6 +418,7 @@ When something goes wrong
 conv km m                 → Unknown context: km
 conv 3 furlongz m         → Unknown unit: furlongz
 conv 1 m s                → Can't convert from m [length] to s [time]
+conv 5 ft 10 kg m         → Can't add kg to ft
 conv 5 m / s kph          → Unknown unit: /
 ```
 

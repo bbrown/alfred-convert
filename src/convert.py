@@ -349,6 +349,9 @@ class Converter:
 
         """
         ctx, query = self.parse_context(query)
+        # 5'10" is 5 ft 10 in
+        query = re.sub(r"(?<=\d)['′]", ' ft ', query)
+        query = re.sub(r'(?<=\d)["″]', ' in ', query)
         # Read "$100 eur" as "100 $ eur"
         cur = query[:1] if query[:1] in CURRENCY_SYMBOLS else ''
         qty, tail = self.parse_quantity(query[len(cur):])
@@ -452,24 +455,52 @@ class Converter:
             qty (int, optional): Quantity of from units
 
         Returns:
-            (pint.Quantity, list): From quantity, and Pint's name for each
-                to unit.
+            (pint.Quantity, list): From quantity, the sum of mixed input
+                such as "5 ft 10 in", and Pint's name for each to unit.
 
         Raises:
-            ValueError: Raised if a unit is unknown.
+            ValueError: Raised if a unit is unknown, or mixed input can't
+                be added up.
 
         """
         units = re.sub(r'\s+per\s+', '/', query).split()
+        total = None
+        while True:
+            unit = units.pop(0)
+            # "ft10in" in "5ft10in": split off the next number and unit
+            m = re.match(r'([^\W\d]+)(\d[\d.]*[^\W\d]\w*)$', unit)
+            if m and not ureg.parse_unit_name(unit):  # cmH2O is a unit
+                unit = m.group(1)
+                units.insert(0, m.group(2))
+
+            q = quantity(qty, unit)
+            if total is None:
+                total = q
+            else:  # "-1 h 30 min" is -1.5 h
+                try:
+                    total = total - q if total.magnitude < 0 else total + q
+                except TypeError:  # different dimensions, or degC
+                    raise ValueError("Can't add {} to {}".format(
+                        symbol(q.units), symbol(total.units)))
+
+            # Mixed input, e.g. "5 ft 10 in": another number and unit
+            qty, rest = self.parse_quantity(' '.join(units))
+            if qty is None:
+                break
+            if not rest:
+                raise ValueError('No unit after {:g}'.format(qty))
+            units = rest.split()
+
         # "10 km to mi". Only between units, so "10 km in" is still inches.
-        if len(units) > 2 and units[1] in ('to', 'in', 'as', '->', '='):
-            del units[1]
-        log.debug('[parser] from_unit=%s, to_units=%s', units[0], units[1:])
+        if len(units) > 1 and units[0] in ('to', 'in', 'as', '->', '='):
+            del units[0]
+        log.debug('[parser] from=%s, to_units=%s', total, units)
         to_units = []
-        for u in units[1:]:
+        for u in units:
             q = quantity(1, u)
             # Keep "l/100km" as typed: Pint's name would drop the 100
             to_units.append(str(q.units) if q.magnitude == 1 else u)
-        return quantity(qty, units[0]), to_units
+        return total, to_units
 
 
 def register_units():

@@ -94,6 +94,24 @@ def test_valid():
         assert c.parse(t[0])[:4] == t[1]  # all fields but context
 
 
+def test_mixed_input():
+    """5'10", 5 ft 10 in and 5ft10in are all 70 inches."""
+    c = convert.Converter(None)
+    for query in ('5 ft 10 in cm', '5ft10in cm', '5\'10" cm', '5′10″ cm',
+                  '5ft 10in to cm'):
+        i = c.parse(query)
+        assert (i.number, i.from_unit, i.to_units) == (
+            pytest.approx(70 / 12), 'foot', ['centimeter'])
+    assert c.parse('1h30min')[:3] == (1.5, '[time]', 'hour')
+    assert c.parse('-1 h 30 min').number == -1.5
+    assert c.parse('1 cmH2O').from_unit == 'centimeter_H2O'  # not split
+    for query, error in [('5 ft 10', 'No unit after 10'),
+                         ('5 ft 10 kg', "Can't add kg to ft"),
+                         ('20 degC 5 degF', "Can't add")]:
+        with pytest.raises(ValueError, match=error):
+            c.parse(query)
+
+
 def test_number_formats():
     """Scientific notation, fractions and the web's minus sign "−"."""
     c = convert.Converter(None)
