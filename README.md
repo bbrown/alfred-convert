@@ -57,7 +57,7 @@ When you select a result:
 | `⌘↩` | Save the unit as a default for this dimensionality, or remove it |
 | `⌘L` | Show the result in Large Type                                    |
 
-Copied results leave out the unit unless you turn on `COPY_UNIT` in the [configuration sheet](#configuration).
+Copied results leave out the unit unless you turn on `COPY_UNIT` in the [configuration sheet](#configuration), or the result has several units, such as `5 ft 10.87 in`.
 
 Type `convinfo` for help and the workflow's files:
 

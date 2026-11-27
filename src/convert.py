@@ -10,6 +10,7 @@
 """Drives Script Filter to show unit conversions in Alfred 3."""
 
 from collections import namedtuple
+import math
 import os
 import re
 import sys
@@ -205,13 +206,27 @@ class Formatter:
         return p
 
     def formatted(self, n, unit=None, thousands=True):
-        """Format number with separators, and ``unit`` as its symbol."""
+        """Format number with separators, and ``unit`` as its symbol.
+
+        For mixed units such as "foot+inch", ``n`` is in the last unit,
+        and the result shows each unit, e.g. "5 ft 10.87 in".
+
+        """
+        if unit and '+' in unit:
+            units = unit.split('+')
+            numbers = split(abs(n), units, self.decimal_places)
+            return ('-' if n < 0 else '') + ' '.join(
+                self.formatted(x, u, thousands)
+                for x, u in zip(numbers, units))
+
         if self.dynamic_decimals and 0 < abs(n) < 1e-9:
             # 10 decimal places can't show 2 significant digits
             num = '{:.{}e}'.format(n, self.decimal_places)
         else:
             sep = ',' if thousands and self.thousands_separator else ''
-            num = '{:{}.{}f}'.format(n, sep, self._decimal_places(n))
+            # Whole numbers from split() have no decimals
+            places = 0 if isinstance(n, int) else self._decimal_places(n)
+            num = '{:{}.{}f}'.format(n, sep, places)
         # One pass, so swapping "," and "." (e.g. 1.234,50) works
         num = num.translate({ord(','): self.thousands_separator,
                              ord('.'): self.decimal_separator})
@@ -251,8 +266,26 @@ def quantity(number, unit):
     raise ValueError('Unknown unit: {}'.format(unit))
 
 
+def split(total, units, places):
+    """Split ``total`` of the last of ``units`` into whole larger units.
+
+    E.g. 70.87 inches across "foot" and "inch" is ``[5, 10.87]``.
+
+    """
+    total = round(total, places)  # as shown, so 71.996 in isn't 5 ft 12 in
+    numbers = []
+    for unit in units[:-1]:
+        factor = quantity(1, unit).to(units[-1]).magnitude
+        n = math.floor(round(total / factor, 9))  # 5.999999999999999 is 6
+        numbers.append(n)
+        total = max(0.0, round(total - n * factor, places))  # not -0.0
+    return numbers + [int(total) if total.is_integer() else total]
+
+
 def symbol(unit):
     """Return the short name to show for ``unit``, e.g. "°F" for "degF"."""
+    if isinstance(unit, str) and '+' in unit:  # mixed units, e.g. "ft+in"
+        return '+'.join(symbol(u) for u in unit.split('+'))
     try:
         # Pint formats dimensionless as ""
         return '{:~P}'.format(ureg.Unit(unit)) or str(unit)
@@ -309,11 +342,13 @@ class Converter:
         results = []
         qty = ureg.Quantity(i.number, i.from_unit)
         for u in units:
-            to_unit = quantity(1, u)  # magnitude 0.01 for "l/100km"
+            # Mixed units such as "foot+inch" convert to the last one.
+            # Magnitude 0.01 for "l/100km".
+            to_unit = quantity(1, u.split('+')[-1])
 
             # Skip defaults that are the input unit under another name,
             # e.g. a saved "degF" when the input is "degree_Fahrenheit"
-            if not i.to_units and to_unit.units == qty.units:
+            if not i.to_units and to_unit.units == qty.units and '+' not in u:
                 continue
 
             try:
@@ -497,9 +532,14 @@ class Converter:
         log.debug('[parser] from=%s, to_units=%s', total, units)
         to_units = []
         for u in units:
-            q = quantity(1, u)
-            # Keep "l/100km" as typed: Pint's name would drop the 100
-            to_units.append(str(q.units) if q.magnitude == 1 else u)
+            names = []
+            for part in u.split('+'):  # mixed units, e.g. "ft+in"
+                if not part:
+                    raise ValueError('Unknown unit: {}'.format(u))
+                q = quantity(1, part)
+                # Keep "l/100km" as typed: Pint's name would drop the 100
+                names.append(str(q.units) if q.magnitude == 1 else part)
+            to_units.append('+'.join(names))
         return total, to_units
 
 
@@ -614,7 +654,8 @@ def convert(query):
         wf.setvar('query', query)
         for conv in results:
             value = f.formatted(conv.to_number, conv.to_unit)
-            unit = conv.to_unit if COPY_UNIT else None
+            # Mixed units, e.g. "5 ft 10 in", make no sense without units
+            unit = conv.to_unit if COPY_UNIT or '+' in conv.to_unit else None
             copytext = f.formatted(conv.to_number, unit)
             arg = f.formatted(conv.to_number, unit, thousands=False)
 

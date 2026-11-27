@@ -63,6 +63,7 @@ def test_invalid():
         '20.5 m/',  # half-typed: "20.5 m/s kph"
         '1 m)',
         '1 m ft-in',  # Pint raises TypeError on "+" or "-" between units
+        '1 m ft+',  # half-typed: "1 m ft+in"
     ]
     c = convert.Converter(None)
     for query in queries:
@@ -88,6 +89,7 @@ def test_valid():
                            ['degree_Fahrenheit'])),
         ('1 kg lb oz', T(1.0, '[mass]', 'kilogram', ['pound', 'ounce'])),
         ('1 kg to lb oz', T(1.0, '[mass]', 'kilogram', ['pound', 'ounce'])),
+        ('1.8 m ft+in', T(1.8, '[length]', 'meter', ['foot+inch'])),
     ]
     c = convert.Converter(None)
     for t in data:
@@ -218,6 +220,14 @@ def test_formatter():
     assert f.formatted(1.5e-9) == '0.0000000015'
     assert f.formatted(1e-28) == '1.00e-28'  # not "0.00"
     assert f.formatted(-5e-10) == '-5.00e-10'
+
+    # Mixed units: the number is in the last unit
+    assert f.formatted(70.866, 'foot+inch') == '5 ft 10.87 in'
+    assert f.formatted(71.996, 'foot+inch') == '6 ft 0 in'  # not 12.00 in
+    assert f.formatted(72.0000001, 'foot+inch') == '6 ft 0 in'
+    assert f.formatted(-70.866, 'foot+inch') == '-5 ft 10.87 in'
+    assert f.formatted(1e6, 'day+hour+minute+second') == (
+        '11 d 13 h 46 min 40 s')
 
     f = convert.Formatter(2, ',', '.', dynamic_decimals=False)
     assert f.formatted(1234.5, 'm') == '1.234,50 m'

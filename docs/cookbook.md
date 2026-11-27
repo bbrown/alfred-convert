@@ -153,9 +153,10 @@ conv 1 au km              → 149,597,870.70 km
 conv 1 pc ly              → 3.26 ly
 conv 5 ft 10 in cm        → 177.80 cm
 conv 5'10" cm             → 177.80 cm
+conv 1.8 m ft+in          → 5 ft 10.87 in
 ```
 
-`nmi` is a nautical mile, `au` an astronomical unit, `pc` a parsec and `ly` a light year. For feet and inches, write both, or use `'` and `"`, as in the last two lines.
+`nmi` is a nautical mile, `au` an astronomical unit, `pc` a parsec and `ly` a light year. For feet and inches, write both, or use `'` and `"`. To get feet and inches back, join the units with `+`, as in the last line.
 
 
 Area
@@ -200,6 +201,7 @@ conv 11 stone kg          → 69.85 kg
 conv 1 t lb               → 2,204.62 lb
 conv 1 ton kg             → 907.18 kg
 conv 1 ozt g              → 31.10 g
+conv 100 kg stone+lb      → 15 stone 10.46 lb
 ```
 
 `t` is a metric tonne and `ton` a US short ton. `ozt` is a troy ounce, used for precious metals.
@@ -245,6 +247,7 @@ conv 3 weeks days         → 21.00 d
 conv 1 year days          → 365.25 d
 conv 1 century years      → 100.00 yr
 conv 1h30min min          → 90.00 min
+conv 1000000 s d+h+min+s  → 11 d 13 h 46 min 40 s
 ```
 
 A `year` is 365.25 days. Mixed times work too, but write minutes as `min`: `m` is a metre.
