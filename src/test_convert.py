@@ -151,11 +151,13 @@ def test_defaults():
 
 
 def test_formatter():
-    """Dynamic decimals work the same for negative numbers."""
+    """Dynamic decimals show 2 significant digits, negative numbers too."""
     f = convert.Formatter(2, '.', ',', dynamic_decimals=True)
     assert f.formatted(-1234.5) == '-1,234.50'
     assert f.formatted(-0.004) == '-0.004'
     assert f.formatted(0.004) == '0.004'
+    assert f.formatted(0.015) == '0.015'
+    assert f.formatted(0.0046) == '0.0046'
 
 
 def test_bad_currency_symbols_are_skipped(monkeypatch):

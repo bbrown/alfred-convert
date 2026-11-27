@@ -184,7 +184,8 @@ class Formatter(object):
         """Calculate the number of decimal places the result should have.
 
         If :attr:`dynamic_decimals` is `True`, increase the number of
-        decimal places until the result is non-zero.
+        decimal places until two significant digits show (at most 10),
+        without trailing zeros.
 
         Args:
             n (float): Number that will be formatted.
@@ -198,30 +199,14 @@ class Formatter(object):
         if not self.dynamic_decimals or n == 0.0:
             return self.decimal_places
 
-        m = max(self.decimal_places, 10) + 1
         p = self.decimal_places
-        while p < m:
-            e = 10 ** p
-            i = n * e
-            # log.debug('n=%r, e=%d, i=%r, p=%d', n, e, i, p)
-            if abs(i) >= 10:
-                break
-
+        while p < 10 and abs(n) * 10 ** p < 10:
             p += 1
 
-        # Remove trailing zeroes
-        s = str(i)
-        if '.' not in s:  # not a fraction
-            return p
+        if p > self.decimal_places:  # drop trailing zeros: 0.0040 -> 0.004
+            digits = '{:.{}f}'.format(n, p).rstrip('0').split('.')[1]
+            p = max(len(digits), self.decimal_places)
 
-        _, s = s.split('.', 1)
-        # log.debug('s=%s, p=%d', s, p)
-        while s.endswith('0'):
-            s = s[:-1]
-            p -= 1
-            # log.debug('s=%s, p=%d', s, p)
-
-        p = max(p, self.decimal_places)
         log.debug('places=%d', p)
         return p
 
