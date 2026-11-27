@@ -34,6 +34,7 @@ Usage
 Type `conv`, a number and a unit. To convert to a particular unit, add it at the end:
 
 - `conv 128 mph kph`
+- `conv 128 mph to kph` (`to`, `in`, `as`, `->` or `=` between the units is optional)
 - `conv 72in cm` (the space after the number is optional)
 - `conv 100psi bar`
 - `conv 20.5 m/s mph`

@@ -438,7 +438,10 @@ class Converter:
 
         """
         from_unit = to_unit = None
-        units = [s.strip() for s in query.split()]
+        units = re.sub(r'\s+per\s+', '/', query).split()
+        # "10 km to mi". Only between units, so "10 km in" is still inches.
+        if len(units) > 2 and units[1] in ('to', 'in', 'as', '->', '='):
+            del units[1]
         from_unit = units[0]
         log.debug('[parser] from_unit=%s', from_unit)
 

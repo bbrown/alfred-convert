@@ -43,9 +43,12 @@ Type `conv`, a number, the unit to convert from and the unit to convert to:
 ```text
 conv 26.2 mi km           → 42.16 km
 conv 26.2mi km            → 42.16 km
+conv 26.2 mi to km        → 42.16 km
+conv 12 in in cm          → 30.48 cm
+conv 12 m in              → 472.44 in
 ```
 
-The space between the number and the unit is optional. If you leave out the unit to convert to, the workflow uses your [default units](#default-units).
+The space between the number and the unit is optional. You can put `to`, `in`, `as`, `->` or `=` between the units. A lone `in` at the end is inches, as in the last line. If you leave out the unit to convert to, the workflow uses your [default units](#default-units).
 
 
 Reading the results
@@ -119,14 +122,15 @@ conv 1 MB kB              → 1,000.00 kB
 conv 1 mb kb              → 0.000001 kb
 ```
 
-Build compound units with `/`, `*` and powers (`^2`, `**2` or `²`). Don't put spaces inside a unit:
+Build compound units with `/` (or the word `per`), `*` and powers (`^2`, `**2` or `²`). Don't put other spaces inside a unit:
 
 ```text
-conv 3 m^2 ft^2           → 32.29 ft²
-conv 100 ft² m²           → 9.29 m²
-conv 1 m**3 l             → 1,000.00 l
-conv 10 m/s km/h          → 36.00 km/h
-conv 100 N*m ft*lbf       → 73.76 ft·lbf
+conv 3 m^2 ft^2                 → 32.29 ft²
+conv 100 ft² m²                 → 9.29 m²
+conv 1 m**3 l                   → 1,000.00 l
+conv 10 m/s km/h                → 36.00 km/h
+conv 60 miles per hour km per h → 96.56 km/h
+conv 100 N*m ft*lbf             → 73.76 ft·lbf
 ```
 
 

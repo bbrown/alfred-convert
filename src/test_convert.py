@@ -80,6 +80,11 @@ def test_valid():
                         'kilometer_per_hour')),
         ('21.3 m^2 acres', T(21.3, '[length] ** 2', 'meter²', 'acre')),
         ('+5km m', T(5.0, '[length]', 'kilometer', 'meter')),
+        ('1 km to mi', T(1.0, '[length]', 'kilometer', 'mile')),
+        ('1 km in', T(1.0, '[length]', 'kilometer', 'inch')),
+        ('1 in in cm', T(1.0, '[length]', 'inch', 'centimeter')),
+        ('5 miles per hour kph', T(5.0, '[length] / [time]', 'mile/hour',
+                                   'kilometer_per_hour')),
         ('20 degC degF', T(20.0, '[temperature]', 'degree_Celsius',
                            'degree_Fahrenheit')),
     ]
