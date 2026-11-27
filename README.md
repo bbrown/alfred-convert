@@ -71,7 +71,7 @@ Type `convinfo` for help and the workflow's files:
 Currencies
 ----------
 
-Use a currency's symbol, e.g. `conv 100 eur gbp`. See the [list of supported currencies](./docs/currencies.md), or search it in Alfred with `convinfo` → **View All Supported Currencies**.
+Use a currency's code, e.g. `conv 100 eur gbp`, or one of the symbols `$`, `€`, `£`, `¥`, `₹` and `₿`, e.g. `conv $100 eur`. See the [list of supported currencies](./docs/currencies.md), or search it in Alfred with `convinfo` → **View All Supported Currencies**.
 
 Exchange rates come from:
 
@@ -109,17 +109,17 @@ Configuration
 
 Set these variables in the workflow's [configuration sheet][config-sheet] (the `[𝒙]` button in Alfred Preferences):
 
-| Variable                  | Meaning                                                                                                 | Default |
-|---------------------------|---------------------------------------------------------------------------------------------------------|---------|
-| `APP_KEY`                 | API key for openexchangerates.org. See [API keys](#api-keys).                                           | None    |
-| `COPY_UNIT`               | Include the unit when copying a result. Any value except `0` or empty turns this on.                    | Off     |
-| `CRYPTO_API_KEY`          | API key for CryptoCompare. See [API keys](#api-keys).                                                   | None    |
-| `CURRENCY_DECIMAL_PLACES` | Decimal places in currency results. If empty, `DECIMAL_PLACES` is used.                                 | `2`     |
-| `DECIMAL_PLACES`          | Decimal places in results.                                                                              | `2`     |
-| `DECIMAL_SEPARATOR`       | Character between whole numbers and decimal fractions, in queries and results.                          | `.`     |
-| `DYNAMIC_DECIMALS`        | Add decimal places (up to 10) until the result isn't zero. Any value except `0` or empty turns this on. | On      |
-| `THOUSANDS_SEPARATOR`     | Character between groups of thousands, in queries and results.                                          | `,`     |
-| `UPDATE_INTERVAL`         | Minutes between exchange rate updates.                                                                  | `360`   |
+| Variable                  | Meaning                                                                                                                               | Default |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------|---------|
+| `APP_KEY`                 | API key for openexchangerates.org. See [API keys](#api-keys).                                                                         | None    |
+| `COPY_UNIT`               | Include the unit when copying a result. Any value except `0` or empty turns this on.                                                  | Off     |
+| `CRYPTO_API_KEY`          | API key for CryptoCompare. See [API keys](#api-keys).                                                                                 | None    |
+| `CURRENCY_DECIMAL_PLACES` | Decimal places in currency results. If empty, `DECIMAL_PLACES` is used.                                                               | `2`     |
+| `DECIMAL_PLACES`          | Decimal places in results.                                                                                                            | `2`     |
+| `DECIMAL_SEPARATOR`       | Character between whole numbers and decimal fractions, in queries and results.                                                        | `.`     |
+| `DYNAMIC_DECIMALS`        | Add decimal places (up to 10) until the result isn't zero, then use scientific notation. Any value except `0` or empty turns this on. | On      |
+| `THOUSANDS_SEPARATOR`     | Character between groups of thousands, in queries and results.                                                                        | `,`     |
+| `UPDATE_INTERVAL`         | Minutes between exchange rate updates.                                                                                                | `360`   |
 
 
 Custom units

@@ -465,7 +465,6 @@ class Converter:
 
         log.debug('[parser] quantity=%s, tail=%s', qty, tail)
 
-        # Parse query into pint.Quantity objects
         from_unit, to_units = self.parse_units(tail, qty)
 
         i = Input(from_unit.magnitude, str(from_unit.dimensionality),

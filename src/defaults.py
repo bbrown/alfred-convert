@@ -21,8 +21,8 @@ from workflow import Workflow
 
 log = None
 
-# Defaults for a dimensionality the user hasn't saved any for, in Pint's
-# names for the units, as saved defaults are
+# Defaults for a dimensionality the user hasn't saved any for. Like saved
+# defaults, they're Pint's names for the units.
 STARTER_DEFAULTS = {
     '[length]': ['centimeter', 'meter', 'kilometer', 'inch', 'foot', 'mile'],
     '[mass]': ['gram', 'kilogram', 'ounce', 'pound'],
