@@ -11,6 +11,7 @@
 
 from collections import namedtuple
 from datetime import timedelta
+from fractions import Fraction
 import functools
 import math
 import os
@@ -136,6 +137,9 @@ def start_update(wf):
 
 
 VULGAR_FRACTIONS = '¼½¾⅐⅑⅒⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞'
+# Fractions on measuring cups and spoons, e.g. {Fraction(3, 8): '⅜'}
+KITCHEN_FRACTIONS = {Fraction(unicodedata.numeric(c)).limit_denominator(8): c
+                     for c in '⅛¼⅓⅜½⅝⅔¾⅞'}
 
 # Number at the start of a query. "−" is the minus sign web pages use.
 # {t} and {d} are the thousands and decimal separators.
@@ -655,6 +659,17 @@ def subtitle(conv, f):
             text += ' · rates updated ' + human_timedelta(
                 timedelta(seconds=age))
         return text
+
+    n = conv.to_number
+    if conv.to_unit in ('cup', 'tablespoon', 'teaspoon') and n > 0:
+        # Nearest eighth or third, e.g. "≈ 1⅓ cup"
+        amount = min((Fraction(round(n * d), d) for d in (3, 8)),
+                     key=lambda a: abs(a - n))
+        whole, part = divmod(amount, 1)
+        if amount:
+            return '≈ {}{} {}'.format(whole or '',
+                                      KITCHEN_FRACTIONS.get(part, ''),
+                                      symbol(conv.to_unit))
     return ''
 
 

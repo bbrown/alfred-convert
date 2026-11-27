@@ -193,6 +193,8 @@ conv 350 degF degC        → 176.67 °C
 
 Gallons, pints, cups and fluid ounces are US measures. For UK measures, start the name with `UK_`. A `pinch` is 1/16 teaspoon and a `dash` 1/8, as on US measuring spoons, and a `stick` is a stick of butter by weight. The last line converts an oven temperature.
 
+A result in cups, tablespoons or teaspoons also shows the nearest amount on a measuring cup or spoon below it, e.g. `250 ml cup` shows "≈ 1 cup" under 1.06 cup.
+
 
 Mass and weight
 ---------------

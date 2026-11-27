@@ -334,7 +334,17 @@ def test_currency_symbols(monkeypatch):
         assert (i.from_unit, i.to_units) == (from_unit, to_units)
 
 
-def show(query, monkeypatch, rates=None):
+@pytest.fixture(scope='module')
+def workflow_ureg():
+    """Unit registry as main() builds it, with the built-in units."""
+    ureg = convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS,
+                                on_redefinition='ignore')
+    ureg.formatter.default_format = 'P'
+    ureg.load_definitions(convert.BUILTIN_UNIT_DEFINITIONS)
+    return ureg
+
+
+def show(query, monkeypatch, ureg, rates=None):
     """Return the results Alfred would show for ``query``."""
     wf = FakeWorkflow()
     wf.age = 3 * 3600 + 600
@@ -344,22 +354,32 @@ def show(query, monkeypatch, rates=None):
                         ('THOUSANDS_SEPARATOR', ','),
                         ('DYNAMIC_DECIMALS', True), ('COPY_UNIT', False)]:
         monkeypatch.setattr(convert, name, value)
+    monkeypatch.setattr(convert, 'ureg', ureg)
     if rates:
-        monkeypatch.setattr(convert, 'ureg', convert.UnitRegistry(
-            convert.DEFAULT_UNIT_DEFINITIONS))
-        convert.ureg.formatter.default_format = 'P'
         convert.register_exchange_rates(rates)
     convert.convert(query)
     return wf.items
 
 
-def test_currency_subtitle(monkeypatch):
+def test_currency_subtitle(monkeypatch, workflow_ureg):
     """Currency results show the rate, and how old the rates are."""
-    [item] = show('10 eur usd', monkeypatch, {'EUR': 0.5})
+    [item] = show('10 eur usd', monkeypatch, workflow_ureg, {'EUR': 0.5})
     assert item['subtitle'] == (
         '1 EUR = 2.00 USD · rates updated 3 hours 10 minutes ago')
-    [item] = show('10 km mi', monkeypatch)
+    [item] = show('10 km mi', monkeypatch, workflow_ureg)
     assert item['subtitle'] == ''
+
+
+def test_kitchen_fractions(monkeypatch, workflow_ureg):
+    """Cups and spoons show the nearest amount a measuring cup has."""
+    for query, title, subtitle in [
+            ('100 ml cup', '0.42 cup', '≈ ⅜ cup'),
+            ('1 l cup', '4.23 cup', '≈ 4¼ cup'),
+            ('1.5 tbsp tsp', '4.50 tsp', '≈ 4½ tsp'),
+            ('2 tbsp cup', '0.12 cup', '≈ ⅛ cup'),
+            ('1 ml cup', '0.0042 cup', '')]:  # nearest is 0
+        [item] = show(query, monkeypatch, workflow_ureg)
+        assert (item['title'], item['subtitle']) == (title, subtitle)
 
 
 def test_currency_error_names_missing_key(monkeypatch):
