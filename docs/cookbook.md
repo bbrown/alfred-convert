@@ -257,9 +257,10 @@ conv 1 year days          → 365.25 d
 conv 1 century years      → 100.00 yr
 conv 1h30min min          → 90.00 min
 conv 1000000 s d+h+min+s  → 11 d 13 h 46 min 40 s
+conv 1 decade yr          → Can't convert from decade (dimensionless) to yr (time)
 ```
 
-A `year` is 365.25 days. Mixed times work too, but write minutes as `min`: `m` is a metre.
+A `year` is 365.25 days. Mixed times work too, but write minutes as `min`: `m` is a metre. In Pint, a `decade` is a factor of 10, as on a log scale, not 10 years, so write `10 yr` instead.
 
 
 Data and transfer rates
