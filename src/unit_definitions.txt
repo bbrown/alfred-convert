@@ -22,3 +22,28 @@ mile_per_gallon = mile / gallon = mpg
 @alias knot = kn
 @alias stone = st
 Calorie = 1e3 * calorie = Cal
+
+# Cooking, as US measuring spoons mark them. A drop is a metric drop, and
+# a stick is a stick of butter by weight (113 g).
+pinch = teaspoon / 16
+dash = teaspoon / 8
+drop = 0.05 ml
+jigger = 1.5 floz
+stick = 4 oz
+
+# Counting
+dozen = 12
+bakers_dozen = 13
+score = 20
+gross = 144
+
+# Just for fun
+smoot = 1.7018 m  # Oliver Smoot's height, as marked on the Harvard Bridge
+banana = 7 inch  # for scale
+football_field = 100 yard  # American, without the end zones
+olympic_pool = 2500 m**3  # 50 x 25 x 2 m
+beard_second = 5 nm  # how far a beard grows in a second
+sheppey = 0.875 mile  # the closest distance at which sheep look picturesque
+light_second = speed_of_light * second
+firkin = 9 UK_gallon  # of beer
+cubit = 18 inch

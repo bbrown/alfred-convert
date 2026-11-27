@@ -32,6 +32,7 @@ Recipes for the `conv` keyword, from everyday conversions to a few tricks. Each 
 - [Default units](#default-units)
 - [Contexts](#contexts)
 - [Your own units](#your-own-units)
+- [Just for fun](#just-for-fun)
 - [When something goes wrong](#when-something-goes-wrong)
 
 
@@ -184,10 +185,12 @@ conv 2 cups ml            → 473.18 ml
 conv 1 cup tbsp           → 16.00 tbsp
 conv 1 tbsp tsp           → 3.00 tsp
 conv 12 floz ml           → 354.88 ml
+conv 1 pinch ml           → 0.31 ml
+conv 1 stick g            → 113.40 g
 conv 350 degF degC        → 176.67 °C
 ```
 
-Gallons, pints, cups and fluid ounces are US measures. For UK measures, start the name with `UK_`. The last line converts an oven temperature.
+Gallons, pints, cups and fluid ounces are US measures. For UK measures, start the name with `UK_`. A `pinch` is 1/16 teaspoon and a `dash` 1/8, as on US measuring spoons, and a `stick` is a stick of butter by weight. The last line converts an oven temperature.
 
 
 Mass and weight
@@ -416,6 +419,25 @@ bigmac = 5.69 USD
 conv 1 marathon mi        → 26.22 mi
 conv 3 bigmac eur         → 15.70 EUR
 ```
+
+
+Just for fun
+------------
+
+The workflow adds a few novelty units:
+
+```text
+conv 1 smoot cm           → 170.18 cm
+conv 1 football_field m   → 91.44 m
+conv 1 olympic_pool l     → 2,500,000.00 l
+conv 6 ft banana          → 10.29 banana
+conv 1 light_second km    → 299,792.46 km
+conv 2 gross dozen        → 24.00 dozen
+```
+
+A `smoot` is the height of Oliver Smoot, whose fraternity brothers measured the Harvard Bridge with him in 1958. A `football_field` is 100 yards, without the end zones, and an `olympic_pool` is 2,500 m³. The others are `beard_second` (5 nm, how far a beard grows in a second), `sheppey` (⅞ mile, the closest distance at which sheep look picturesque), `firkin` (9 UK gallons), `cubit` (18 inches), and the counting units `score`, `bakers_dozen` and `gross`.
+
+For bananas for scale in every length result, convert something to `banana` and press `⌘↩` to save it as a default.
 
 
 When something goes wrong
