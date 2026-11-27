@@ -451,6 +451,21 @@ A `smoot` is the height of Oliver Smoot, whose fraternity brothers measured the 
 
 For bananas for scale in every length result, convert something to `banana` and press `⌘↩` to save it as a default.
 
+Pint's own units and prefixes hide a few more:
+
+```text
+conv 1 microcentury min       → 52.60 min
+conv 1 nanocentury s          → 3.16 s
+conv 1 attoparsec cm          → 3.09 cm
+conv 1 kilofortnight yr       → 38.33 yr
+conv 1 furlong/fortnight mm/s → 0.17 mm/s
+conv 1 shake ns               → 10.00 ns
+conv 20 dBm W                 → 0.10 W
+conv 1e9 s yr+d               → 31 yr 251.32 d
+```
+
+A microcentury is about the length of a lecture, a nanocentury is close to π seconds, and an attoparsec is about an inch. The furlong per fortnight is the speed unit of the joke furlong–firkin–fortnight system. A shake, from "two shakes of a lamb's tail", is 10 nanoseconds. `dBm` is decibel-milliwatts, as radio engineers use, and the last line shows how long a billion seconds is.
+
 
 When something goes wrong
 -------------------------
