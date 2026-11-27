@@ -50,6 +50,13 @@ conv 12 m in              → 472.44 in
 
 The space between the number and the unit is optional. You can put `to`, `in`, `as`, `->` or `=` between the units. A lone `in` at the end is inches, as in the last line. If you leave out the unit to convert to, the workflow uses your [default units](#default-units).
 
+To see several results at once, add more units:
+
+```text
+conv 1 kg lb oz           → 2.20 lb
+                          → 35.27 oz
+```
+
 
 Reading the results
 -------------------
@@ -398,7 +405,7 @@ When something goes wrong
 conv km m                 → Unknown context: km
 conv 3 furlongz m         → Unknown unit: furlongz
 conv 1 m s                → Can't convert from m [length] to s [time]
-conv 5 m / s kph          → More than 2 units specified
+conv 5 m / s kph          → Unknown unit: /
 ```
 
 - A query must start with a number. The workflow reads lowercase letters before the number as a [context](#contexts) name.

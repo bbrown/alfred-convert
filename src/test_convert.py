@@ -25,7 +25,7 @@ convert.ureg = convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS)
 convert.ureg.formatter.default_format = 'P'
 
 
-T = namedtuple('T', 'number dimensionality from_unit to_unit')
+T = namedtuple('T', 'number dimensionality from_unit to_units')
 C = convert.Conversion
 
 
@@ -59,7 +59,6 @@ def test_invalid():
         'dave',  # doesn't start with a number
         '1.3',  # no unit
         '5 daves',  # invalid units
-        '10 km m cm',  # too many units
         '-',  # half-typed: "-40 degC degF"
         '20.5 m/',  # half-typed: "20.5 m/s kph"
         '1 m)',
@@ -75,18 +74,20 @@ def test_valid():
     """Test valid input."""
     data = [
         ('1.3 km', T(1.3, '[length]', 'kilometer', None)),
-        ('1.3 km miles', T(1.3, '[length]', 'kilometer', 'mile')),
+        ('1.3 km miles', T(1.3, '[length]', 'kilometer', ['mile'])),
         ('5 m/s kph', T(5.0, '[length] / [time]', 'meter/second',
-                        'kilometer_per_hour')),
-        ('21.3 m^2 acres', T(21.3, '[length] ** 2', 'meter²', 'acre')),
-        ('+5km m', T(5.0, '[length]', 'kilometer', 'meter')),
-        ('1 km to mi', T(1.0, '[length]', 'kilometer', 'mile')),
-        ('1 km in', T(1.0, '[length]', 'kilometer', 'inch')),
-        ('1 in in cm', T(1.0, '[length]', 'inch', 'centimeter')),
+                        ['kilometer_per_hour'])),
+        ('21.3 m^2 acres', T(21.3, '[length] ** 2', 'meter²', ['acre'])),
+        ('+5km m', T(5.0, '[length]', 'kilometer', ['meter'])),
+        ('1 km to mi', T(1.0, '[length]', 'kilometer', ['mile'])),
+        ('1 km in', T(1.0, '[length]', 'kilometer', ['inch'])),
+        ('1 in in cm', T(1.0, '[length]', 'inch', ['centimeter'])),
         ('5 miles per hour kph', T(5.0, '[length] / [time]', 'mile/hour',
-                                   'kilometer_per_hour')),
+                                   ['kilometer_per_hour'])),
         ('20 degC degF', T(20.0, '[temperature]', 'degree_Celsius',
-                           'degree_Fahrenheit')),
+                           ['degree_Fahrenheit'])),
+        ('1 kg lb oz', T(1.0, '[mass]', 'kilogram', ['pound', 'ounce'])),
+        ('1 kg to lb oz', T(1.0, '[mass]', 'kilogram', ['pound', 'ounce'])),
     ]
     c = convert.Converter(None)
     for t in data:

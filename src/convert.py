@@ -149,7 +149,7 @@ class NoToUnits(Exception):
 
 
 # Parsed user query
-Input = namedtuple('Input', 'number dimensionality from_unit to_unit context')
+Input = namedtuple('Input', 'number dimensionality from_unit to_units context')
 
 
 class Formatter:
@@ -285,10 +285,7 @@ class Converter:
             ValueError: Raised if a unit is unknown
 
         """
-        if i.to_unit is not None:
-            units = [i.to_unit]
-        else:
-            units = self.defaults.defaults(i.dimensionality)
+        units = i.to_units or self.defaults.defaults(i.dimensionality)
 
         results = []
         qty = ureg.Quantity(i.number, i.from_unit)
@@ -297,7 +294,7 @@ class Converter:
 
             # Skip defaults that are the input unit under another name,
             # e.g. a saved "degF" when the input is "degree_Fahrenheit"
-            if i.to_unit is None and to_unit.units == qty.units:
+            if not i.to_units and to_unit.units == qty.units:
                 continue
 
             conv = qty.to(to_unit)
@@ -339,15 +336,11 @@ class Converter:
         log.debug('[parser] quantity=%s, tail=%s', qty, tail)
 
         # Parse query into pint.Quantity objects
-        from_unit, to_unit = self.parse_units(tail, qty)
+        from_unit, to_units = self.parse_units(tail, qty)
 
-        # Create `Input` from parsed query
-        tu = None
-        # Pint raises on bool() of offset units (degC, degF)
-        if to_unit is not None:
-            tu = str(to_unit.units)
         i = Input(from_unit.magnitude, str(from_unit.dimensionality),
-                  str(from_unit.units), tu, ctx)
+                  str(from_unit.units),
+                  [str(u.units) for u in to_units] or None, ctx)
 
         log.debug('[parser] %s', i)
 
@@ -422,41 +415,26 @@ class Converter:
         return n, query[m.end():].strip()
 
     def parse_units(self, query, qty=1):
-        """Extract from and (optional) to units from query.
+        """Extract from unit and any to units from query.
 
         Args:
             query (str): (Partial) user input
             qty (int, optional): Quantity of from units
 
         Returns:
-            (pint.Quantity, pint.Quantity): From and to quantities. To
-                quantity is initialised with ``1``.
+            (pint.Quantity, list): From quantity, and a quantity of 1 of
+                each to unit.
 
         Raises:
-            ValueError: Raised if a unit is unknown, or more than 2 units
-                are specified.
+            ValueError: Raised if a unit is unknown.
 
         """
-        from_unit = to_unit = None
         units = re.sub(r'\s+per\s+', '/', query).split()
         # "10 km to mi". Only between units, so "10 km in" is still inches.
         if len(units) > 2 and units[1] in ('to', 'in', 'as', '->', '='):
             del units[1]
-        from_unit = units[0]
-        log.debug('[parser] from_unit=%s', from_unit)
-
-        if len(units) > 1:
-            to_unit = units[1]
-            log.debug('[parser] to_unit=%s', to_unit)
-        if len(units) > 2:
-            raise ValueError('More than 2 units specified')
-
-        # Validate units
-        from_unit = quantity(qty, from_unit)
-        if to_unit:
-            to_unit = quantity(1, to_unit)
-
-        return from_unit, to_unit
+        log.debug('[parser] from_unit=%s, to_units=%s', units[0], units[1:])
+        return quantity(qty, units[0]), [quantity(1, u) for u in units[1:]]
 
 
 def register_units():
