@@ -2,9 +2,9 @@
 Changelog
 =========
 
-### 3.9.0 ###
+### [3.9.0][v3.9.0] ###
 
-Unreleased
+Released 2026-11-26
 
 - Write `to`, `in`, `as`, `->` or `=` between units, and `per` for `/`, e.g. `conv 26.2 mi to km` or `conv 60 miles per hour kph`
 - Convert to several units at once, e.g. `conv 1 kg lb oz`
@@ -281,4 +281,5 @@ Released 2014-08-09.
 [v3.6.2]: https://github.com/deanishe/alfred-convert/releases/tag/v3.6.2
 [v3.7.0]: https://github.com/deanishe/alfred-convert/releases/tag/v3.7.0
 [v3.8.0]: https://github.com/bbrown/alfred-convert/releases/tag/v3.8.0
+[v3.9.0]: https://github.com/bbrown/alfred-convert/releases/tag/v3.9.0
 [openx]: https://openexchangerates.org/
