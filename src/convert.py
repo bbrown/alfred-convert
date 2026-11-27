@@ -26,6 +26,7 @@ from config import (
     COPY_UNIT,
     CRYPTO_API_KEY,
     CRYPTO_CURRENCIES,
+    CURRENCIES,
     CURRENCY_ATTEMPT_CACHE_NAME,
     CURRENCY_CACHE_AGE,
     CURRENCY_CACHE_NAME,
@@ -545,9 +546,11 @@ def register_exchange_rates(exchange_rates):
             log.debug('skipping currency %s : Unit is already defined', abbr)
             continue
 
-        try:
-            ureg.Quantity(1, abbr.lower())
-        except UndefinedUnitError:
+        # A fiat code beats a name Pint only gets via a prefix, e.g. "php"
+        # (picohorsepower); an exact unit name such as "cup" still wins
+        found = ureg.parse_unit_name(abbr.lower())
+        if not found or (abbr in CURRENCIES and
+                         all(prefix for prefix, _, _ in found)):
             definition += ' = {}'.format(abbr.lower())
 
         log.debug('registering currency : %r', definition)

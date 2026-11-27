@@ -169,6 +169,16 @@ def test_bad_currency_symbols_are_skipped(monkeypatch):
     assert convert.ureg.Quantity(1, 'EUR').to('usd').magnitude == 2.0
 
 
+def test_lowercase_currency_codes(monkeypatch):
+    """Lowercase "php" is the peso, not picohorsepower; "cup" is a volume."""
+    monkeypatch.setattr(convert, 'ureg',
+                        convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS))
+    convert.register_exchange_rates({'PHP': 50.0, 'CUP': 24.0})
+    assert convert.ureg.Quantity(100, 'php').to('usd').magnitude == 2.0
+    assert str(convert.ureg.Quantity(1, 'cup').dimensionality) == (
+        '[length] ** 3')
+
+
 def test_currency_error_names_missing_key(monkeypatch):
     """Unknown currencies say which API key would add them."""
     shown = []
