@@ -39,6 +39,8 @@ Type `conv`, a number and a unit. To convert to a particular unit, add it at the
 - `conv 20.5 m/s mph`
 - `conv 100 eur gbp`
 
+The [cookbook](./docs/cookbook.md) has many more examples, with tips for writing numbers and units.
+
 If you leave out the unit to convert to, the workflow uses your default units for that dimensionality, such as length or mass. To save a default, select a result and press `⌘↩`.
 
 Some conversions only work in a [Pint context][pintcontexts]. Put the context's name or short name first: `conv spectroscopy 1Å eV` or `conv sp 1Å eV`.

@@ -1,0 +1,391 @@
+
+Cookbook
+========
+
+<!--
+src/test_cookbook.py runs every example in the ```text blocks below. Each
+"conv <query> → <result>" line must show what Alfred shows with the default
+settings in src/info.plist. Put further results of the same query on the
+next lines, starting with "→". The ```ini block holds custom units the
+examples use, and the two tables set the exchange rates and saved defaults.
+-->
+
+Recipes for the `conv` keyword, from everyday conversions to a few tricks. Each example shows what Alfred displays with the workflow's default settings.
+
+- [The shape of a query](#the-shape-of-a-query)
+- [Reading the results](#reading-the-results)
+- [Writing numbers](#writing-numbers)
+- [Writing units](#writing-units)
+- [Length and distance](#length-and-distance)
+- [Area](#area)
+- [Volume and cooking](#volume-and-cooking)
+- [Mass and weight](#mass-and-weight)
+- [Temperature](#temperature)
+- [Speed and pace](#speed-and-pace)
+- [Time](#time)
+- [Data and transfer rates](#data-and-transfer-rates)
+- [Energy and power](#energy-and-power)
+- [Pressure](#pressure)
+- [Angles](#angles)
+- [Other compound units](#other-compound-units)
+- [Currencies](#currencies)
+- [Default units](#default-units)
+- [Contexts](#contexts)
+- [Your own units](#your-own-units)
+- [When something goes wrong](#when-something-goes-wrong)
+
+
+The shape of a query
+--------------------
+
+Type `conv`, a number, the unit to convert from and the unit to convert to:
+
+```text
+conv 26.2 mi km           → 42.16 kilometer
+conv 26.2mi km            → 42.16 kilometer
+```
+
+The space between the number and the unit is optional. If you leave out the unit to convert to, the workflow uses your [default units](#default-units).
+
+
+Reading the results
+-------------------
+
+A result shows the number and Pint's full name for the unit, so `mi` comes back as `mile`. Numbers have 2 decimal places and a `,` between thousands. Small results get extra decimal places, up to 10, so they don't round to zero:
+
+```text
+conv 1 km mm              → 1,000,000.00 millimeter
+conv 15 mm m              → 0.015 meter
+conv 1 mm km              → 0.000001 kilometer
+```
+
+To change how numbers look, set `DECIMAL_PLACES`, `DYNAMIC_DECIMALS`, `DECIMAL_SEPARATOR` and `THOUSANDS_SEPARATOR` in the [configuration sheet](../README.md#configuration). [Usage](../README.md#usage) lists the keys for copying a result, saving a default and Large Type.
+
+
+Writing numbers
+---------------
+
+Use `.` for decimals. The workflow ignores thousands separators, and a leading `-` makes a number negative:
+
+```text
+conv 2.5 cm in            → 0.98 inch
+conv .5 m cm              → 50.00 centimeter
+conv 1,500 m km           → 1.50 kilometer
+conv -40 degC degF        → -40.00 degree_Fahrenheit
+```
+
+If you change `DECIMAL_SEPARATOR` or `THOUSANDS_SEPARATOR`, write numbers that way, e.g. `2,5` with a `,` decimal separator. There's no scientific notation: see [When something goes wrong](#when-something-goes-wrong).
+
+
+Writing units
+-------------
+
+Use a unit's symbol, its name or its plural:
+
+```text
+conv 3 ft m               → 0.91 meter
+conv 3 feet m             → 0.91 meter
+conv 3 foot meters        → 0.91 meter
+```
+
+Put an SI prefix on any unit. Type `u` for micro (µ):
+
+```text
+conv 2 GHz MHz            → 2,000.00 megahertz
+conv 1500 um mm           → 1.50 millimeter
+```
+
+Units are case-sensitive. `MB` is megabytes, but `mb` is millibarns:
+
+```text
+conv 1 MB kB              → 1,000.00 kilobyte
+conv 1 mb kb              → 0.000001 kilobarn
+```
+
+Build compound units with `/`, `*` and powers (`^2`, `**2` or `²`). Don't put spaces inside a unit:
+
+```text
+conv 3 m^2 ft^2           → 32.29 foot²
+conv 100 ft² m²           → 9.29 meter²
+conv 1 m**3 l             → 1,000.00 liter
+conv 10 m/s km/h          → 36.00 kilometer/hour
+conv 100 N*m ft*lbf       → 73.76 foot·force_pound
+```
+
+
+Length and distance
+-------------------
+
+```text
+conv 5 km mi              → 3.11 mile
+conv 6 ft cm              → 182.88 centimeter
+conv 70 in cm             → 177.80 centimeter
+conv 1 nmi km             → 1.85 kilometer
+conv 1 au km              → 149,597,870.70 kilometer
+conv 1 pc ly              → 3.26 light_year
+```
+
+`nmi` is a nautical mile, `au` an astronomical unit, `pc` a parsec and `ly` a light year. A query has only one unit to convert from, so for 5 ft 10 in, convert 70 in.
+
+
+Area
+----
+
+```text
+conv 1 acre m^2           → 4,046.87 meter²
+conv 1 ha acre            → 2.47 acre
+conv 2000 sq_ft m^2       → 185.81 meter²
+conv 1 km^2 mi^2          → 0.39 mile²
+```
+
+`ha` is a hectare. Write square units with a power, or use Pint's `sq_` names such as `sq_ft`.
+
+
+Volume and cooking
+------------------
+
+```text
+conv 1 gal l              → 3.79 liter
+conv 1 UK_gallon l        → 4.55 liter
+conv 1 pint ml            → 473.18 milliliter
+conv 1 UK_pint ml         → 568.26 milliliter
+conv 2 cups ml            → 473.18 milliliter
+conv 1 cup tbsp           → 16.00 tablespoon
+conv 1 tbsp tsp           → 3.00 teaspoon
+conv 12 floz ml           → 354.88 milliliter
+conv 350 degF degC        → 176.67 degree_Celsius
+```
+
+Gallons, pints, cups and fluid ounces are US measures. For UK measures, start the name with `UK_`. The last line converts an oven temperature.
+
+
+Mass and weight
+---------------
+
+```text
+conv 70 kg lb             → 154.32 pound
+conv 1 lb g               → 453.59 gram
+conv 12 oz g              → 340.19 gram
+conv 11 stone kg          → 69.85 kilogram
+conv 1 t lb               → 2,204.62 pound
+conv 1 ton kg             → 907.18 kilogram
+conv 1 ozt g              → 31.10 gram
+```
+
+`t` is a metric tonne and `ton` a US short ton. `ozt` is a troy ounce, used for precious metals.
+
+
+Temperature
+-----------
+
+```text
+conv 20 degC degF                → 68.00 degree_Fahrenheit
+conv 98.6 degF degC              → 37.00 degree_Celsius
+conv 20 °C °F                    → 68.00 degree_Fahrenheit
+conv 20 celsius fahrenheit       → 68.00 degree_Fahrenheit
+conv 300 K degC                  → 26.85 degree_Celsius
+conv 10 delta_degC delta_degF    → 18.00 delta_degree_Fahrenheit
+```
+
+Write degrees as `degC`, `°C` or `celsius`, and the same way for Fahrenheit. `K` is kelvin. These convert a temperature from one scale to another. To convert a change in temperature, such as a rise of 10 °C, use `delta_degC` and `delta_degF`.
+
+
+Speed and pace
+--------------
+
+```text
+conv 100 km/h mph         → 62.14 mile_per_hour
+conv 60 mph kph           → 96.56 kilometer_per_hour
+conv 20 knots km/h        → 37.04 kilometer/hour
+conv 5 min/km min/mi      → 8.05 minute/mile
+```
+
+Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last line. The result is in decimal minutes: 8.05 minutes is about 8 minutes 3 seconds.
+
+
+Time
+----
+
+```text
+conv 90 min h             → 1.50 hour
+conv 2.5 h min            → 150.00 minute
+conv 3 weeks days         → 21.00 day
+conv 1 year days          → 365.25 day
+```
+
+A `year` is 365.25 days.
+
+
+Data and transfer rates
+-----------------------
+
+```text
+conv 1 GB MB              → 1,000.00 megabyte
+conv 1 GiB MiB            → 1,024.00 mebibyte
+conv 500 GB GiB           → 465.66 gibibyte
+conv 100 Mbit/s MB/s      → 12.50 megabyte/second
+```
+
+`B` is a byte and `bit` is a bit. `kB`, `MB` and `GB` count in thousands, while `KiB`, `MiB` and `GiB` count in 1,024s. That's why a 500 GB drive shows up as 465 GB in some apps. Internet speeds are usually in megabits per second (`Mbit/s`).
+
+
+Energy and power
+----------------
+
+```text
+conv 1 kWh MJ             → 3.60 megajoule
+conv 2000 kcal kJ         → 8,368.00 kilojoule
+conv 150 hp kW            → 111.85 kilowatt
+conv 100 W BTU/h          → 341.21 british_thermal_unit/hour
+```
+
+`kcal` is the food Calorie. `hp` is mechanical horsepower.
+
+
+Pressure
+--------
+
+```text
+conv 32 psi bar           → 2.21 bar
+conv 1 atm kPa            → 101.33 kilopascal
+conv 1013 hPa inHg        → 29.91 inch_Hg
+```
+
+Weather reports use hectopascals (`hPa`) or inches of mercury (`inHg`).
+
+
+Angles
+------
+
+```text
+conv 90 deg rad           → 1.57 radian
+conv 1 rad deg            → 57.30 degree
+conv 1 turn deg           → 360.00 degree
+```
+
+
+Other compound units
+--------------------
+
+```text
+conv 30 mi/gal km/l       → 12.75 kilometer/liter
+conv 30 mpg km/l          → Unknown unit: mpg
+conv 30 mi/gal l/km       → Can't convert from mile / gallon 1 / [length] ** 2 to liter / kilometer [length] ** 2
+conv 1 g/cm^3 kg/m^3      → 1,000.00 kilogram/meter³
+conv 10 gal/min l/s       → 0.63 liter/second
+conv 1 g0 m/s^2           → 9.81 meter/second²
+```
+
+Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow can't convert between them, or to litres per 100 km. `g0` is standard gravity.
+
+
+Currencies
+----------
+
+Use a currency's three-letter code, in upper or lower case. See the [supported currencies](./currencies.md). The workflow downloads exchange rates in the background, so your results depend on the day's rates. These examples use made-up rates:
+
+| Currency | Per US dollar |
+|----------|---------------|
+| EUR      | 0.92          |
+| GBP      | 0.79          |
+| JPY      | 150           |
+| PHP      | 58            |
+
+```text
+conv 100 eur usd          → 108.70 USD
+conv 100 USD EUR          → 92.00 EUR
+conv 5,000 jpy usd        → 33.33 USD
+conv 1000 php usd         → 17.24 USD
+```
+
+Prefixes work on currencies too: `kEUR` is thousands of euros. Prices per unit convert as well:
+
+```text
+conv 1.5 kEUR usd         → 1,630.43 USD
+conv 5 usd/lb eur/kg      → 10.14 EUR/kilogram
+conv 4 usd/gal eur/l      → 0.97 EUR/liter
+```
+
+Without an API key, a few currencies (such as gold, `XAU`) and all cryptocurrencies have no exchange rates. The workflow tells you which key to set, and selecting the message opens the instructions. See [API keys](../README.md#api-keys).
+
+```text
+conv 1 xau usd            → Set APP_KEY to convert this currency
+conv 1 eth usd            → Set CRYPTO_API_KEY to convert this currency
+```
+
+A currency also needs to be in your [active currencies](../README.md#active-currencies). Currency results use `CURRENCY_DECIMAL_PLACES`.
+
+
+Default units
+-------------
+
+If you leave out the unit to convert to, the workflow converts to your default units for that dimensionality, such as length, mass or currency. To save a default, select a result and press `⌘↩`. To remove one, press `⌘↩` on it again. These examples assume you've saved these defaults:
+
+| Dimensionality  | Default units       |
+|-----------------|---------------------|
+| `[currency]`    | `EUR`, `GBP`        |
+| `[temperature]` | `degree_Fahrenheit` |
+
+```text
+conv 100 usd              → 92.00 EUR
+                          → 79.00 GBP
+conv 100 eur              → 85.87 GBP
+conv 20 degC              → 68.00 degree_Fahrenheit
+conv 5 kg                 → No destination units (or defaults) for [mass]
+```
+
+The workflow skips a default that's the same as the unit you convert from, so `100 eur` only shows pounds. With no defaults for a dimensionality, it says so.
+
+
+Contexts
+--------
+
+Some conversions link different kinds of quantity through physics, such as the wavelength and frequency of light. Pint only does these in a [context][pintcontexts]. Put the context's name first:
+
+```text
+conv sp 500 nm THz           → 599.58 terahertz
+conv sp 2.5 eV nm            → 495.94 nanometer
+conv spectroscopy 1Å eV      → 12,398.42 electron_volt
+conv boltzmann 300 K meV     → 25.85 millielectron_volt
+```
+
+`spectroscopy`, or `sp` for short, links wavelength, frequency and photon energy. `boltzmann` links temperature and energy. The workflow reads lowercase letters before the number as a context name, so contexts whose names start with a capital, such as `Gaussian`, don't work.
+
+
+Your own units
+--------------
+
+Add units to `unit_definitions.txt` with `convinfo` → **Edit Custom Units**, one per line in [Pint's format][pinthowto]. A unit can build on any other unit, including a currency:
+
+```ini
+marathon = 42.195 km
+bigmac = 5.69 USD
+```
+
+```text
+conv 1 marathon mi        → 26.22 mile
+conv 3 bigmac eur         → 15.70 EUR
+```
+
+
+When something goes wrong
+-------------------------
+
+```text
+conv km m                 → Unknown context: km
+conv 3 furlongz m         → Unknown unit: furlongz
+conv 1 m s                → Can't convert from meter [length] to second [time]
+conv 5 m / s kph          → More than 2 units specified
+conv 1e3 m km             → More than 2 units specified
+```
+
+- A query must start with a number. The workflow reads lowercase letters before the number as a [context](#contexts) name.
+- If the workflow doesn't know a unit, check the spelling or look it up in Pint's [list of units][pintunits].
+- You can only convert between units of the same kind. The message shows each unit's dimensionality.
+- Don't put spaces inside a unit: write `m/s`.
+- There's no scientific notation, so `e3` is read as a unit. Use a prefix instead, such as `1 km` for 1e3 m.
+
+
+[pintcontexts]: https://pint.readthedocs.io/en/stable/user/contexts.html
+[pinthowto]: https://pint.readthedocs.io/en/stable/advanced/defining.html
+[pintunits]: https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
