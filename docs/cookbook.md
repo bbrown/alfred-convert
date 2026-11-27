@@ -183,6 +183,7 @@ conv 1 pint ml            → 473.18 ml
 conv 1 UK_pint ml         → 568.26 ml
 conv 2 cups ml            → 473.18 ml
 conv 1 cup tbsp           → 16.00 tbsp
+conv 250 ml cup           → 1.06 cup
 conv 1 tbsp tsp           → 3.00 tsp
 conv 12 floz ml           → 354.88 ml
 conv 1 pinch ml           → 0.31 ml

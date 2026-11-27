@@ -13,8 +13,11 @@ barrel_of_oil_equivalent = 5.8e6 Btu = boe
 # Million standard cubic feet
 MMscf = 28.31685 l * 1000000 = mmscf
 
-# Show years as "yr", not Pint's "a" (annum). Same definition otherwise.
+# Show years as "yr", not Pint's "a" (annum), and cups as "cup", not
+# "cp". Same definitions otherwise.
 year = 365.25 * day = yr = a = julian_year
+cup = pint / 2 = _ = cp = liquid_cup = US_liquid_cup
+imperial_cup = imperial_pint / 2 = _ = imperial_cp = UK_cup
 
 # Short names people use: miles per US gallon, knots, stones and food
 # Calories
