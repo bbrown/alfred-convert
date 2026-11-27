@@ -394,7 +394,7 @@ Until you save your own, the workflow has defaults for length, mass, temperature
 conv 5 kg                 → 5,000.00 g
                           → 176.37 oz
                           → 11.02 lb
-conv 1 g/cm^3             → No destination units (or defaults) for [mass] / [length] ** 3
+conv 1 g/cm^3             → No destination units (or defaults) for density
 ```
 
 
@@ -455,7 +455,7 @@ When something goes wrong
 ```text
 conv km m                 → Unknown context: km
 conv 3 furlongz m         → Unknown unit: furlongz
-conv 1 m s                → Can't convert from m [length] to s [time]
+conv 1 m s                → Can't convert from m (length) to s (time)
 conv 5 ft 10 kg m         → Can't add kg to ft
 conv 5 m / s kph          → Unknown unit: /
 ```

@@ -10,6 +10,7 @@
 """Drives Script Filter to show unit conversions in Alfred 3."""
 
 from collections import namedtuple
+import functools
 import math
 import os
 import re
@@ -295,6 +296,25 @@ def symbol(unit):
         return '{:~P}'.format(ureg.Unit(unit)) or str(unit)
     except ValueError:  # a number in the unit, e.g. "l/100km": show as typed
         return unit
+
+
+@functools.lru_cache()
+def dimension_name(dimensionality):
+    """Return a name for ``dimensionality``, e.g. "area" for "[length] ** 2".
+
+    Args:
+        dimensionality (str): Pint's dimensionality, e.g. "[length] ** 2"
+
+    """
+    if dimensionality != 'dimensionless':  # refractive index is too
+        # shortcut: Pint lists dimension names only in the private
+        # ureg._dimensions; use a public API if a Pint upgrade adds one
+        for name in ureg._dimensions:
+            # Gaussian and ESU names, e.g. pace is "gaussian_resistance"
+            if (not name.startswith(('[gaussian_', '[esu_')) and
+                    str(ureg.get_dimensionality(name)) == dimensionality):
+                return name.strip('[]').replace('_', ' ')
+    return dimensionality.replace('[', '').replace(']', '')
 
 
 class Converter:
@@ -636,12 +656,13 @@ def convert(query):
         except NoToUnits:
             log.critical('No to_units (or defaults) for %s', i.dimensionality)
             error = 'No destination units (or defaults) for {}'.format(
-                i.dimensionality)
+                dimension_name(i.dimensionality))
 
         except DimensionalityError as err:
             log.critical('invalid conversion (%s): %s', query, err)
-            error = "Can't convert from {} {} to {} {}".format(
-                symbol(err.units1), err.dim1, symbol(err.units2), err.dim2)
+            error = "Can't convert from {} ({}) to {} ({})".format(
+                symbol(err.units1), dimension_name(str(err.dim1)),
+                symbol(err.units2), dimension_name(str(err.dim2)))
 
         except KeyError as err:
             log.critical('invalid context (%s): %s', i.context, err)
@@ -681,10 +702,10 @@ def convert(query):
                 action = 'delete'
                 name = 'Remove'
 
-            mod = it.add_modifier(
-                'cmd',
-                '{} {} as default unit for {}'.format(
-                    name, symbol(conv.to_unit), conv.dimensionality))
+            label = '{} as default unit for {}'.format(
+                symbol(conv.to_unit), dimension_name(conv.dimensionality))
+            mod = it.add_modifier('cmd', '{} {}'.format(name, label))
+            mod.setvar('label', label)  # for defaults.py's notification
             mod.setvar('action', action)
             mod.setvar('unit', conv.to_unit)
             mod.setvar('dimensionality', conv.dimensionality)

@@ -14,6 +14,7 @@ Save/delete default units for given dimensionality.
 """
 
 from collections import defaultdict
+import os
 
 from workflow import Workflow
 
@@ -117,15 +118,19 @@ def main(wf):
 
     defs = Defaults(wf)
     log.debug('defaults=%r', defs._defs)
+    # As the result's subtitle said it, e.g. "km/h as default unit for
+    # velocity"
+    label = os.getenv('label') or '{} as default unit for {}'.format(
+        unit, dimensionality)
 
     if action == 'save':
         defs.add(dimensionality, unit)
-        print('Saved {} as default unit for {}'.format(unit, dimensionality))
+        print('Saved ' + label)
         return
 
     if action == 'delete':
         defs.remove(dimensionality, unit)
-        print('Removed {} as default unit for {}'.format(unit, dimensionality))
+        print('Removed ' + label)
         return
 
 

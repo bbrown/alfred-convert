@@ -239,6 +239,18 @@ def test_starter_defaults():
     assert [r.to_unit for r in c.convert(c.parse('1 km'))] == ['meter']
 
 
+def test_dimension_names():
+    """Messages name dimensionalities, e.g. "area" for "[length] ** 2"."""
+    for dimensionality, name in [
+            ('[length]', 'length'),
+            ('[length] ** 2', 'area'),
+            ('[length] ** 3 / [time]', 'volumetric flow rate'),
+            ('[time] / [length]', 'time / length'),  # not Gaussian
+            ('[currency] / [mass]', 'currency / mass'),
+            ('dimensionless', 'dimensionless')]:
+        assert convert.dimension_name(dimensionality) == name
+
+
 def test_formatter():
     """Dynamic decimals show 2 significant digits, negative numbers too."""
     f = convert.Formatter(2, '.', ',', dynamic_decimals=True)
