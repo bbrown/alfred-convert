@@ -12,21 +12,12 @@
 
 Save/delete default units for given dimensionality.
 
-Usage:
-    defaults.py save <dimensionality> <unit>
-    defaults.py delete <dimensionality> <unit>
-    defaults.py --help
-
-Options:
-    -h, --help  Show this message
-
 """
 
 from __future__ import print_function, absolute_import
 
 from collections import defaultdict
 
-from docopt import docopt
 from workflow import Workflow
 
 
@@ -109,21 +100,18 @@ class Defaults(object):
 
 def main(wf):
     """Run script."""
-    args = docopt(__doc__, wf.args)
-    log.debug('args=%r', args)
+    log.debug('args=%r', wf.args)
+    action, dimensionality, unit = wf.args
 
     defs = Defaults(wf)
     log.debug('defaults=%r', defs._defs)
 
-    dimensionality = args['<dimensionality>']
-    unit = args['<unit>']
-
-    if args['save']:
+    if action == 'save':
         defs.add(dimensionality, unit)
         print(u'Saved {} as default unit for {}'.format(unit, dimensionality))
         return
 
-    if args['delete']:
+    if action == 'delete':
         defs.remove(dimensionality, unit)
         print(u'Removed {} as default unit for {}'.format(unit, dimensionality))
         return

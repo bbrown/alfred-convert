@@ -8,26 +8,10 @@
 # Created on 2014-12-26
 #
 
-"""info.py [options] [<query>]
+"""info.py [<query> | --openhelp | --openactive | --openunits | --openapi]
 
-View/manage workflow settings.
-
-Usage:
-    info.py [<query>]
-    info.py (-h|--help)
-    info.py --openhelp
-    info.py --openactive
-    info.py --openunits
-    info.py --openapi
-    info.py --currencies [<query>]
-
-Options:
-    -h, --help    Show this message
-    --openhelp    Open help file in default browser
-    --openactive  Open active currency file in default editor
-    --openunits   Open custom units file in default editor
-    --openapi     Open the openexchangerates.org signup page
-    --currencies  View/search supported currencies
+View/manage workflow settings. The --open... arguments open the help
+file, active currency file, custom units file or API key signup page.
 
 """
 
@@ -36,8 +20,6 @@ from __future__ import absolute_import
 from datetime import timedelta
 import subprocess
 import sys
-
-from docopt import docopt
 
 from workflow import (
     ICON_INFO,
@@ -168,32 +150,22 @@ def main(wf):
         wf (workflow.Workflow): Workflow object.
 
     """
-    args = docopt(__doc__, wf.args)
+    query = wf.args[0] if wf.args else ''
 
-    log.debug('args : {!r}'.format(args))
-
-    query = args.get('<query>')
+    log.debug('query : %r', query)
 
     bootstrap(wf)
 
     # Alternative actions ----------------------------------------------
 
-    if args.get('--openapi'):
-        subprocess.call(['open', SIGNUP_URL])
-        return
-
-    if args.get('--openhelp'):
-        subprocess.call(['open', README_URL])
-        return
-
-    if args.get('--openunits'):
-        path = wf.datafile(CUSTOM_DEFINITIONS_FILENAME)
-        subprocess.call(['open', path])
-        return
-
-    if args.get('--openactive'):
-        path = wf.datafile(ACTIVE_CURRENCIES_FILENAME)
-        subprocess.call(['open', path])
+    opens = {
+        '--openapi': SIGNUP_URL,
+        '--openhelp': README_URL,
+        '--openunits': wf.datafile(CUSTOM_DEFINITIONS_FILENAME),
+        '--openactive': wf.datafile(ACTIVE_CURRENCIES_FILENAME),
+    }
+    if query in opens:
+        subprocess.call(['open', opens[query]])
         return
 
     # Parse query ------------------------------------------------------
