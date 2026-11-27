@@ -140,6 +140,18 @@ def test_units_with_numbers():
             c.parse(query)
 
 
+def test_reciprocal_units():
+    """Pace and speed, or fuel economy and consumption, are inverses."""
+    c = convert.Converter(None)
+    for query, number in [('5 min/km km/h', 12), ('10 mph min/mi', 6),
+                          ('30 mi/gal l/100km', 7.84), ('50 Hz ms', 20)]:
+        [conv] = c.convert(c.parse(query))
+        assert conv.to_number == pytest.approx(number, abs=0.01)
+    for query in ('0 mph min/mi', '1 m s'):  # 1/0, and not inverses
+        with pytest.raises(convert.DimensionalityError):
+            c.convert(c.parse(query))
+
+
 def test_conversion():
     """Test conversions."""
     data = [

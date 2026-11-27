@@ -226,9 +226,11 @@ conv 100 km/h mph         → 62.14 mph
 conv 60 mph kph           → 96.56 kph
 conv 20 knots km/h        → 37.04 km/h
 conv 5 min/km min/mi      → 8.05 min/mi
+conv 5 min/km km/h        → 12.00 km/h
+conv 10 mph min/mi        → 6.00 min/mi
 ```
 
-Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last line. The result is in decimal minutes: 8.05 minutes is about 8 minutes 3 seconds.
+Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last three lines. Pace and speed are inverses, and the workflow converts between them. The result is in decimal minutes: 8.05 minutes is about 8 minutes 3 seconds.
 
 
 Time
@@ -300,15 +302,16 @@ Other compound units
 ```text
 conv 30 mi/gal km/l       → 12.75 km/l
 conv 30 mpg km/l          → Unknown unit: mpg
-conv 30 mi/gal l/km       → Can't convert from mi/gal 1 / [length] ** 2 to l/km [length] ** 2
+conv 30 mi/gal l/100km    → 7.84 l/100km
 conv 1 g/cm^3 kg/m^3      → 1,000.00 kg/m³
 conv 10 gal/min l/s       → 0.63 l/s
 conv 1 g0 m/s^2           → 9.81 m/s²
 conv 0.07 l/km l/100km    → 7.00 l/100km
 conv 30 kWh/100mi kWh/100km → 18.64 kWh/100km
+conv 50 Hz ms             → 20.00 ms
 ```
 
-Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow can't convert between them. `g0` is standard gravity. A unit can include a number, such as `l/100km` for litres per 100 km or `kWh/100mi` for an electric car's consumption.
+Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow divides 1 by the number to convert between them. It does the same for any units that are inverses, such as a frequency (`Hz`) and the time of one cycle (`ms`). `g0` is standard gravity. A unit can include a number, such as `l/100km` for litres per 100 km or `kWh/100mi` for an electric car's consumption.
 
 
 Currencies

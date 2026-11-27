@@ -312,7 +312,15 @@ class Converter:
             if not i.to_units and to_unit.units == qty.units:
                 continue
 
-            conv = qty.to(to_unit)
+            try:
+                conv = qty.to(to_unit)
+            except DimensionalityError:
+                # Reciprocal units, e.g. pace (min/km) and speed (km/h)
+                if (qty.dimensionality != 1 / to_unit.dimensionality or
+                        not qty.magnitude):
+                    raise
+                # Base units, as Pint can't divide by an offset unit (degC)
+                conv = (1 / qty.to_base_units()).to(to_unit)
             log.debug('[convert] %s -> %s = %s', i.from_unit, u, conv)
             results.append(Conversion(i.number, i.from_unit,
                                       conv.magnitude / to_unit.magnitude, u,
