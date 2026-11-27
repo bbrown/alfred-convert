@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # MIT Licence. See http://opensource.org/licenses/MIT
 #

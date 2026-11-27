@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
 #
@@ -14,8 +13,6 @@ View/manage workflow settings. The --open... arguments open the help
 file, active currency file, custom units file or API key signup page.
 
 """
-
-from __future__ import absolute_import
 
 from datetime import timedelta
 import subprocess
@@ -48,7 +45,7 @@ SIGNUP_URL = 'https://openexchangerates.org/signup/free'
 
 log = None
 
-DELIMITER = u'\u203a'  # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
+DELIMITER = '\u203a'  # SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
 
 
 def human_timedelta(td):
@@ -103,7 +100,7 @@ def handle_delimited_query(query):
     if query.endswith(DELIMITER):  # User deleted trailing space
         run_trigger('config')
 
-    mode, query = [s.strip() for s in query.split(DELIMITER, 1)]
+    mode, query = (s.strip() for s in query.split(DELIMITER, 1))
 
     if mode == 'currencies':
 
@@ -132,8 +129,8 @@ def handle_delimited_query(query):
                         icon=ICON_WARNING)
 
         for name, symbol in currencies:
-            wf.add_item(u'{} // {}'.format(name, symbol),
-                        u'Use `{}` in conversions'.format(symbol),
+            wf.add_item('{} // {}'.format(name, symbol),
+                        'Use `{}` in conversions'.format(symbol),
                         copytext=symbol,
                         valid=False,
                         icon=ICON_CURRENCY)
@@ -184,7 +181,7 @@ def main(wf):
 
         dict(title='View All Supported Currencies',
              subtitle='View and search list of supported currencies',
-             autocomplete=u'currencies {} '.format(DELIMITER),
+             autocomplete='currencies {} '.format(DELIMITER),
              icon=ICON_CURRENCY),
 
         dict(title='Edit Active Currencies',

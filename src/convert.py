@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
 #
@@ -9,8 +8,6 @@
 #
 
 """Drives Script Filter to show unit conversions in Alfred 3."""
-
-from __future__ import print_function
 
 from collections import namedtuple
 import os
@@ -139,7 +136,7 @@ class NoToUnits(Exception):
 Input = namedtuple('Input', 'number dimensionality from_unit to_unit context')
 
 
-class Formatter(object):
+class Formatter:
     """Format a number.
 
     Attributes:
@@ -218,7 +215,7 @@ def quantity(number, unit):
         raise ValueError('Unknown unit: {}'.format(unit))
 
 
-class Converter(object):
+class Converter:
     """Parse query and convert.
 
     Parses user input into an `Input` object, then converts this into
@@ -505,25 +502,25 @@ def convert(query):
     try:
         i = c.parse(query)
     except ValueError as err:
-        log.critical(u'invalid query (%s): %s', query, err)
+        log.critical('invalid query (%s): %s', query, err)
         error = str(err)
 
     else:
         try:
             results = c.convert(i)
         except NoToUnits:
-            log.critical(u'No to_units (or defaults) for %s', i.dimensionality)
-            error = u'No destination units (or defaults) for {}'.format(
+            log.critical('No to_units (or defaults) for %s', i.dimensionality)
+            error = 'No destination units (or defaults) for {}'.format(
                 i.dimensionality)
 
         except DimensionalityError as err:
-            log.critical(u'invalid conversion (%s): %s', query, err)
-            error = u"Can't convert from {} {} to {} {}".format(
+            log.critical('invalid conversion (%s): %s', query, err)
+            error = "Can't convert from {} {} to {} {}".format(
                 err.units1, err.dim1, err.units2, err.dim2)
 
         except KeyError as err:
-            log.critical(u'invalid context (%s): %s', i.context, err)
-            error = u'Unknown context: {}'.format(i.context)
+            log.critical('invalid context (%s): %s', i.context, err)
+            error = 'Unknown context: {}'.format(i.context)
 
     if not error and not results:
         error = 'Conversion input not understood'
@@ -560,7 +557,7 @@ def convert(query):
 
             mod = it.add_modifier(
                 'cmd',
-                u'{} {} as default unit for {}'.format(
+                '{} {} as default unit for {}'.format(
                     name, conv.to_unit, conv.dimensionality))
             mod.setvar('action', action)
             mod.setvar('unit', conv.to_unit)
@@ -614,11 +611,11 @@ def main(wf):
     if is_running('update'):
         wf.rerun = 0.5
         if exchange_rates is None:  # No data cached yet
-            wf.add_item(u'Fetching exchange rates…',
+            wf.add_item('Fetching exchange rates…',
                         'Currency conversions will be momentarily possible',
                         icon=ICON_INFO)
         else:
-            wf.add_item(u'Updating exchange rates…',
+            wf.add_item('Updating exchange rates…',
                         icon=ICON_INFO)
 
     return convert(query)

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # MIT Licence. See http://opensource.org/licenses/MIT
 #
@@ -16,7 +15,7 @@ import currency
 currency.log = logging.getLogger('currency')
 
 
-class FakeResponse(object):
+class FakeResponse:
     """Just enough of `workflow.web.Response`."""
 
     status_code = 200

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright  (c) 2014 deanishe@deanishe.net
 #
@@ -9,8 +8,6 @@
 #
 
 """Script to update exchange rates in the background."""
-
-from __future__ import print_function
 
 from multiprocessing.dummy import Pool
 import os

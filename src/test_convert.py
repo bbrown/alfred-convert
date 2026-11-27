@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
 #
@@ -9,8 +8,6 @@
 #
 
 """Test converter."""
-
-from __future__ import print_function, absolute_import
 
 from collections import namedtuple
 import logging
@@ -32,7 +29,7 @@ T = namedtuple('T', 'number dimensionality from_unit to_unit')
 C = convert.Conversion
 
 
-class FakeWorkflow(object):
+class FakeWorkflow:
     """Just enough of `workflow.Workflow`: settings and cache in memory."""
 
     def __init__(self, tmp_path=None):
@@ -80,7 +77,7 @@ def test_valid():
         ('1.3 km miles', T(1.3, '[length]', 'kilometer', 'mile')),
         ('5 m/s kph', T(5.0, '[length] / [time]', 'meter/second',
                         'kilometer_per_hour')),
-        ('21.3 m^2 acres', T(21.3, '[length] ** 2', u'meter²', 'acre')),
+        ('21.3 m^2 acres', T(21.3, '[length] ** 2', 'meter²', 'acre')),
         ('+5km m', T(5.0, '[length]', 'kilometer', 'meter')),
         ('20 degC degF', T(20.0, '[temperature]', 'degree_Celsius',
                            'degree_Fahrenheit')),

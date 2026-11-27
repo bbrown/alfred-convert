@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
 #
@@ -14,8 +13,6 @@ Save/delete default units for given dimensionality.
 
 """
 
-from __future__ import print_function, absolute_import
-
 from collections import defaultdict
 
 from workflow import Workflow
@@ -24,7 +21,7 @@ from workflow import Workflow
 log = None
 
 
-class Defaults(object):
+class Defaults:
     """Manage default units for dimensionalities.
 
     Saves default units in workflow's settings file.
@@ -108,12 +105,12 @@ def main(wf):
 
     if action == 'save':
         defs.add(dimensionality, unit)
-        print(u'Saved {} as default unit for {}'.format(unit, dimensionality))
+        print('Saved {} as default unit for {}'.format(unit, dimensionality))
         return
 
     if action == 'delete':
         defs.remove(dimensionality, unit)
-        print(u'Removed {} as default unit for {}'.format(unit, dimensionality))
+        print('Removed {} as default unit for {}'.format(unit, dimensionality))
         return
 
 

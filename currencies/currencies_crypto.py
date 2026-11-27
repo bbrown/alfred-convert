@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
 # Copyright (c) 2017 Dean Jackson <deanishe@deanishe.net>
 #
@@ -11,8 +10,6 @@
 """
 Filter list of cryptocurrencies by whether an exchange rate is available.
 """
-
-from __future__ import print_function, absolute_import
 
 from collections import namedtuple
 import csv
