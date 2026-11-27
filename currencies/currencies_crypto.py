@@ -16,7 +16,6 @@ from __future__ import print_function, absolute_import
 
 from collections import namedtuple
 import csv
-from itertools import zip_longest
 import os
 import sys
 from time import sleep
@@ -38,26 +37,6 @@ crypto_currencies_file = os.path.join(here, 'currencies_crypto.tsv')
 Currency = namedtuple('Currency', 'symbol name')
 
 
-def grouper(n, iterable):
-    """Return iterable that splits `iterable` into groups of size `n`.
-
-    Args:
-        n (int): Size of each group.
-        iterable (iterable): The iterable to split into groups.
-
-    Returns:
-        list: Tuples of length `n` containing items
-            from `iterable`.
-
-    """
-    sentinel = object()
-    args = [iter(iterable)] * n
-    groups = []
-    for l in zip_longest(*args, fillvalue=sentinel):
-        groups.append([v for v in l if v is not sentinel])
-    return groups
-
-
 def main():
     """Generate list of cryptocurrencies with exchange rates."""
     headers = {'Authorization': 'Apikey ' + api_key}
@@ -74,7 +53,8 @@ def main():
     print('%d total currencies' % len(all_currencies))
 
     # for c in sorted(all_currencies):
-    for currencies in grouper(20, all_currencies):
+    for i in range(0, len(all_currencies), 20):
+        currencies = all_currencies[i:i + 20]
         url = base_url.format(reference_currency,
                               ','.join([c.symbol for c in currencies]))
         r = web.get(url, headers=headers)

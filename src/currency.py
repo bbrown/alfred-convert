@@ -12,7 +12,6 @@
 
 from __future__ import print_function
 
-from itertools import zip_longest
 from multiprocessing.dummy import Pool
 import os
 import time
@@ -38,26 +37,6 @@ from config import (
 
 
 log = None
-
-
-def grouper(n, iterable):
-    """Return iterable that splits `iterable` into groups of size `n`.
-
-    Args:
-        n (int): Size of each group.
-        iterable (iterable): The iterable to split into groups.
-
-    Returns:
-        list: Tuples of length `n` containing items
-            from `iterable`.
-
-    """
-    sentinel = object()
-    args = [iter(iterable)] * n
-    groups = []
-    for l in zip_longest(*args, fillvalue=sentinel):
-        groups.append([v for v in l if v is not sentinel])
-    return groups
 
 
 def load_cryptocurrency_rates(symbols):
@@ -168,7 +147,8 @@ def fetch_exchange_rates():
         if s in active:
             syms.append(s)
     if CRYPTO_API_KEY:
-        for symbols in grouper(SYMBOLS_PER_REQUEST, syms):
+        for i in range(0, len(syms), SYMBOLS_PER_REQUEST):
+            symbols = syms[i:i + SYMBOLS_PER_REQUEST]
             jobs.append((load_cryptocurrency_rates, (symbols,)))
     else:
         log.info('not fetching cryptocurrency exchange rates: '
