@@ -185,13 +185,13 @@ class Formatter:
         return p
 
     def formatted(self, n, unit=None, thousands=True):
-        """Format number with decimal and (optional) thousands separators."""
+        """Format number with separators, and ``unit`` as its symbol."""
         sep = ',' if thousands and self.thousands_separator else ''
         num = '{:{}.{}f}'.format(n, sep, self._decimal_places(n))
         # One pass, so swapping "," and "." (e.g. 1.234,50) works
         num = num.translate({ord(','): self.thousands_separator,
                              ord('.'): self.decimal_separator})
-        return '{} {}'.format(num, unit) if unit else num
+        return '{} {}'.format(num, symbol(unit)) if unit else num
 
 
 # Result of converting an `Input` to one unit
@@ -214,6 +214,11 @@ def quantity(number, unit):
             DefinitionSyntaxError, TypeError):
         error_if_currency(unit)
         raise ValueError('Unknown unit: {}'.format(unit))
+
+
+def symbol(unit):
+    """Return the short name to show for ``unit``, e.g. "°F" for "degF"."""
+    return '{:~P}'.format(ureg.Unit(unit)) or str(unit)  # "" if dimensionless
 
 
 class Converter:
@@ -458,8 +463,9 @@ def register_exchange_rates(exchange_rates):
 
     """
     # USD will be the baseline currency. All exchange rates are
-    # defined relative to the US dollar
-    ureg.define('USD = [currency] = usd')
+    # defined relative to the US dollar. "_" means no symbol, so results
+    # show the code ("USD"), not its lowercase alias.
+    ureg.define('USD = [currency] = _ = usd')
 
     for abbr, rate in exchange_rates.items():
         # Old caches may hold names like "STR*". Pint raises AssertionError
@@ -483,7 +489,7 @@ def register_exchange_rates(exchange_rates):
         found = ureg.parse_unit_name(abbr.lower())
         if not found or (abbr in CURRENCIES and
                          all(prefix for prefix, _, _ in found)):
-            definition += ' = {}'.format(abbr.lower())
+            definition += ' = _ = {}'.format(abbr.lower())
 
         log.debug('registering currency : %r', definition)
         try:
@@ -517,7 +523,7 @@ def convert(query):
         except DimensionalityError as err:
             log.critical('invalid conversion (%s): %s', query, err)
             error = "Can't convert from {} {} to {} {}".format(
-                err.units1, err.dim1, err.units2, err.dim2)
+                symbol(err.units1), err.dim1, symbol(err.units2), err.dim2)
 
         except KeyError as err:
             log.critical('invalid context (%s): %s', i.context, err)
@@ -559,7 +565,7 @@ def convert(query):
             mod = it.add_modifier(
                 'cmd',
                 '{} {} as default unit for {}'.format(
-                    name, conv.to_unit, conv.dimensionality))
+                    name, symbol(conv.to_unit), conv.dimensionality))
             mod.setvar('action', action)
             mod.setvar('unit', conv.to_unit)
             mod.setvar('dimensionality', conv.dimensionality)
@@ -577,9 +583,11 @@ def main(wf):
 
     """
     global ureg
-    # Cache parsed definitions: saves ~80 ms per keystroke
+    # Cache parsed definitions: saves ~80 ms per keystroke. Don't log the
+    # built-in units file's deliberate redefinitions on every keystroke.
     ureg = UnitRegistry(DEFAULT_UNIT_DEFINITIONS,
-                        cache_folder=wf.cachefile('pint'))
+                        cache_folder=wf.cachefile('pint'),
+                        on_redefinition='ignore')
     ureg.formatter.default_format = 'P'
 
     wf.magic_arguments['appkey'] = open_currency_instructions

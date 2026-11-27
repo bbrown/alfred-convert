@@ -93,7 +93,8 @@ class FakeWorkflow(object):
 def ureg():
     """Unit registry as main() builds it, with the doc's units and rates."""
     old = convert.ureg
-    convert.ureg = convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS)
+    convert.ureg = convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS,
+                                        on_redefinition='ignore')
     convert.ureg.formatter.default_format = 'P'
     convert.ureg.load_definitions(convert.BUILTIN_UNIT_DEFINITIONS)
     for lang, body in BLOCKS:

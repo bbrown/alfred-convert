@@ -12,3 +12,6 @@ barrel_of_oil_equivalent = 5.8e6 Btu = boe
 
 # Million standard cubic feet
 MMscf = 28.31685 l * 1000000 = mmscf
+
+# Show years as "yr", not Pint's "a" (annum). Same definition otherwise.
+year = 365.25 * day = yr = a = julian_year
