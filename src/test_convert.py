@@ -225,6 +225,22 @@ def test_lowercase_currency_codes(monkeypatch):
         '[length] ** 3')
 
 
+def test_currency_symbols(monkeypatch):
+    """Symbols stand for currency codes, before or after the number."""
+    monkeypatch.setattr(convert, 'ureg',
+                        convert.UnitRegistry(convert.DEFAULT_UNIT_DEFINITIONS))
+    convert.ureg.formatter.default_format = 'P'
+    convert.register_exchange_rates({'EUR': 0.5, 'GBP': 0.25})
+    c = convert.Converter(None)
+    for query, from_unit, to_units in [
+            ('$100 eur', 'USD', ['EUR']),
+            ('100€ usd', 'EUR', ['USD']),
+            ('£5 $', 'GBP', ['USD']),
+            ('5 $/lb €/kg', 'USD/pound', ['EUR/kilogram'])]:
+        i = c.parse(query)
+        assert (i.from_unit, i.to_units) == (from_unit, to_units)
+
+
 def test_currency_error_names_missing_key(monkeypatch):
     """Unknown currencies say which API key would add them."""
     shown = []

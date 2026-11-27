@@ -34,6 +34,7 @@ from config import (
     CURRENCY_CACHE_NAME,
     CURRENCY_DECIMAL_PLACES,
     CURRENCY_HELP_URL,
+    CURRENCY_SYMBOLS,
     CURRENCY_RETRY_DELAY,
     CUSTOM_DEFINITIONS_FILENAME,
     DECIMAL_PLACES,
@@ -147,6 +148,9 @@ NUMBER = (
 class NoToUnits(Exception):
     """Raised if there are no to units (or defaults)."""
 
+
+# Replaces currency symbols with codes, e.g. "$" with "USD"
+SYMBOLS = str.maketrans(CURRENCY_SYMBOLS)
 
 # Parsed user query
 Input = namedtuple('Input', 'number dimensionality from_unit to_units context')
@@ -345,7 +349,10 @@ class Converter:
 
         """
         ctx, query = self.parse_context(query)
-        qty, tail = self.parse_quantity(query)
+        # Read "$100 eur" as "100 $ eur"
+        cur = query[:1] if query[:1] in CURRENCY_SYMBOLS else ''
+        qty, tail = self.parse_quantity(query[len(cur):])
+        tail = (cur + ' ' + tail).translate(SYMBOLS).strip()
 
         # Show error message for invalid input
         if qty is None:
@@ -642,7 +649,7 @@ def main(wf):
     # Defining ~190 currencies costs ~40 ms, so only do it when the query or
     # a custom unit (e.g. "bigmac = 5.69 USD") may use one. Substrings keep
     # "1 kEUR usd" working; a false match only costs time.
-    text = (query + custom_units).lower()
+    text = (query.translate(SYMBOLS) + custom_units).lower()
     if exchange_rates and any(s.lower() in text for s in exchange_rates):
         register_exchange_rates(exchange_rates)
 

@@ -54,6 +54,10 @@ XRA_API_URL = 'https://api.exchangerate-api.com/v4/latest/{}'
 # it from downloaded rates instead if it goes stale often.
 OPENX_ONLY_CURRENCIES = {
     'BTC', 'CUC', 'KPW', 'SVC', 'VEF', 'XAG', 'XAU', 'XPD', 'XPT'}
+# Symbols a query can use for a currency code. Several currencies use
+# "$" and "¥": these are the most traded.
+CURRENCY_SYMBOLS = {'$': 'USD', '€': 'EUR', '£': 'GBP', '¥': 'JPY', '₹': 'INR',
+                    '₿': 'BTC'}
 CRYPTO_COMPARE_BASE_URL = (
     'https://min-api.cryptocompare.com/data/price?fsym={}&tsyms={}')
 SYMBOLS_PER_REQUEST = 20

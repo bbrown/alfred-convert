@@ -331,7 +331,12 @@ conv 100 eur usd          → 108.70 USD
 conv 100 USD EUR          → 92.00 EUR
 conv 5,000 jpy usd        → 33.33 USD
 conv 1000 php usd         → 17.24 USD
+conv $100 eur             → 92.00 EUR
+conv 100€ usd             → 108.70 USD
+conv £20 $                → 25.32 USD
 ```
+
+You can also write `$`, `€`, `£`, `¥`, `₹` or `₿`, before or after the number. `$` is the US dollar and `¥` the Japanese yen.
 
 Prefixes work on currencies too: `kEUR` is thousands of euros. Prices per unit convert as well:
 
