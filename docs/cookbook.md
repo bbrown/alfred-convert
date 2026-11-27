@@ -427,6 +427,7 @@ Add units to `unit_definitions.txt` with `convinfo` → **Edit Custom Units**, o
 marathon = 42.195 km
 bigmac = 5.69 USD
 workhour = 45 USD
+USD1912 = 33 USD
 ```
 
 ```text
@@ -439,6 +440,13 @@ A unit that's a price shows what things cost in it. With `workhour` set to your 
 ```text
 conv 1200 usd workhour    → 26.67 workhour
 conv 20 eur bigmac        → 3.82 bigmac
+```
+
+A unit can also be money from another year. Set `USD1912` to what $1 in 1912 is worth today (today's consumer price index divided by 1912's, from any inflation calculator) to see what old prices mean now:
+
+```text
+conv 50 USD1912 usd       → 1,650.00 USD
+conv 50 USD1912 eur       → 1,518.00 EUR
 ```
 
 
