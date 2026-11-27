@@ -425,11 +425,19 @@ Add units to `unit_definitions.txt` with `convinfo` → **Edit Custom Units**, o
 ```ini
 marathon = 42.195 km
 bigmac = 5.69 USD
+workhour = 45 USD
 ```
 
 ```text
 conv 1 marathon mi        → 26.22 mi
 conv 3 bigmac eur         → 15.70 EUR
+```
+
+A unit that's a price shows what things cost in it. With `workhour` set to your hourly pay, see how many hours of work something costs, or count it in Big Macs:
+
+```text
+conv 1200 usd workhour    → 26.67 workhour
+conv 20 eur bigmac        → 3.82 bigmac
 ```
 
 
