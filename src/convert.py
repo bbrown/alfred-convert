@@ -507,15 +507,24 @@ class Converter(object):
 
 
 def register_units():
-    """Add built-in and user units to unit registry."""
+    """Add built-in and user units to unit registry.
+
+    Returns:
+        str: The user's unit definitions, without comments.
+
+    """
     # Add custom units from workflow and user data
     ureg.load_definitions(BUILTIN_UNIT_DEFINITIONS)
 
     user_definitions = wf.datafile(CUSTOM_DEFINITIONS_FILENAME)
 
     # User's custom units
-    if os.path.exists(user_definitions):
-        ureg.load_definitions(user_definitions)
+    if not os.path.exists(user_definitions):
+        return ''
+
+    ureg.load_definitions(user_definitions)
+    with open(user_definitions) as fp:
+        return ''.join(line.split('#')[0] for line in fp)
 
 
 def register_exchange_rates(exchange_rates):
@@ -664,12 +673,16 @@ def main(wf):
     bootstrap(wf)
 
     # Add workflow and user units to unit registry
-    register_units()
+    custom_units = register_units()
 
     # Load cached data
     exchange_rates = wf.cached_data(CURRENCY_CACHE_NAME, max_age=0)
 
-    if exchange_rates:  # Add exchange rates to conversion database
+    # Defining ~190 currencies costs ~40 ms, so only do it when the query or
+    # a custom unit (e.g. "bigmac = 5.69 USD") may use one. Substrings keep
+    # "1 kEUR usd" working; a false match only costs time.
+    text = (query + custom_units).lower()
+    if exchange_rates and any(s.lower() in text for s in exchange_rates):
         register_exchange_rates(exchange_rates)
 
     start_update(wf)
