@@ -229,6 +229,11 @@ def test_formatter():
     assert f.formatted(1e6, 'day+hour+minute+second') == (
         '11 d 13 h 46 min 40 s')
 
+    # Pace in minutes and seconds
+    assert f.formatted(8.0467, 'minute/mile') == '8:03 min/mi'
+    assert f.formatted(5.9999, 'minute/kilometer') == '6:00 min/km'
+    assert f.formatted(1.75, 'min/100m', show_unit=False) == '1:45'
+
     f = convert.Formatter(2, ',', '.', dynamic_decimals=False)
     assert f.formatted(1234.5, 'm') == '1.234,50 m'
     assert f.formatted(1234.5, thousands=False) == '1234,50'

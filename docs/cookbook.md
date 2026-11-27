@@ -229,12 +229,12 @@ Speed and pace
 conv 100 km/h mph         → 62.14 mph
 conv 60 mph kph           → 96.56 kph
 conv 20 knots km/h        → 37.04 km/h
-conv 5 min/km min/mi      → 8.05 min/mi
+conv 5 min/km min/mi      → 8:03 min/mi
 conv 5 min/km km/h        → 12.00 km/h
-conv 10 mph min/mi        → 6.00 min/mi
+conv 10 mph min/mi        → 6:00 min/mi
 ```
 
-Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last three lines. Pace and speed are inverses, and the workflow converts between them. The result is in decimal minutes: 8.05 minutes is about 8 minutes 3 seconds.
+Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last three lines, and shows minutes and seconds. Pace and speed are inverses, and the workflow converts between them.
 
 
 Time

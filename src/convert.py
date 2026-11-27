@@ -205,11 +205,13 @@ class Formatter:
         log.debug('places=%d', p)
         return p
 
-    def formatted(self, n, unit=None, thousands=True):
+    def formatted(self, n, unit=None, thousands=True, show_unit=True):
         """Format number with separators, and ``unit`` as its symbol.
 
         For mixed units such as "foot+inch", ``n`` is in the last unit,
-        and the result shows each unit, e.g. "5 ft 10.87 in".
+        and the result always shows each unit, e.g. "5 ft 10.87 in". A
+        pace in minutes per distance shows minutes and seconds, e.g.
+        "8:03 min/mi".
 
         """
         if unit and '+' in unit:
@@ -219,7 +221,9 @@ class Formatter:
                 self.formatted(x, u, thousands)
                 for x, u in zip(numbers, units))
 
-        if self.dynamic_decimals and 0 < abs(n) < 1e-9:
+        if unit and unit.startswith(('minute/', 'min/')) and n >= 0:
+            num = '{}:{:02d}'.format(*divmod(round(n * 60), 60))
+        elif self.dynamic_decimals and 0 < abs(n) < 1e-9:
             # 10 decimal places can't show 2 significant digits
             num = '{:.{}e}'.format(n, self.decimal_places)
         else:
@@ -230,7 +234,7 @@ class Formatter:
         # One pass, so swapping "," and "." (e.g. 1.234,50) works
         num = num.translate({ord(','): self.thousands_separator,
                              ord('.'): self.decimal_separator})
-        return '{} {}'.format(num, symbol(unit)) if unit else num
+        return '{} {}'.format(num, symbol(unit)) if unit and show_unit else num
 
 
 # Result of converting an `Input` to one unit
@@ -654,10 +658,10 @@ def convert(query):
         wf.setvar('query', query)
         for conv in results:
             value = f.formatted(conv.to_number, conv.to_unit)
-            # Mixed units, e.g. "5 ft 10 in", make no sense without units
-            unit = conv.to_unit if COPY_UNIT or '+' in conv.to_unit else None
-            copytext = f.formatted(conv.to_number, unit)
-            arg = f.formatted(conv.to_number, unit, thousands=False)
+            copytext = f.formatted(conv.to_number, conv.to_unit,
+                                   show_unit=COPY_UNIT)
+            arg = f.formatted(conv.to_number, conv.to_unit, thousands=False,
+                              show_unit=COPY_UNIT)
 
             it = wf.add_item(value,
                              valid=True,
