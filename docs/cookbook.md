@@ -71,7 +71,7 @@ conv 1 mm km              → 0.000001 km
 conv 1 barn m^2           → 1.00e-28 m²
 ```
 
-To change how numbers look, set `DECIMAL_PLACES`, `DYNAMIC_DECIMALS`, `DECIMAL_SEPARATOR` and `THOUSANDS_SEPARATOR` in the [configuration sheet](../README.md#configuration). [Usage](../README.md#usage) lists the keys for copying a result, saving a default and Large Type.
+To change how numbers look, set `DECIMAL_PLACES`, `DYNAMIC_DECIMALS`, `DECIMAL_SEPARATOR` and `THOUSANDS_SEPARATOR` in the [configuration sheet](../README.md#configuration). [Usage](../README.md#usage) lists the keys for copying a result, saving a default and Large Type. To convert a result further, press `⇥`: the result becomes your query, ready for another unit.
 
 
 Writing numbers

@@ -768,10 +768,18 @@ def convert(query):
             arg = f.formatted(conv.to_number, conv.to_unit, thousands=False,
                               show_unit=COPY_UNIT)
 
+            # ⇥ starts a new query from the result: "42.1648128 kilometer "
+            number = '{:.12g}'.format(conv.to_number).replace(
+                '.', DECIMAL_SEPARATOR)
+            autocomplete = '{}{} {} '.format(
+                i.context + ' ' if i.context else '', number,
+                conv.to_unit.split('+')[-1])  # mixed units: the last one
+
             it = wf.add_item(value,
                              subtitle(conv, f),
                              valid=True,
                              arg=arg,
+                             autocomplete=autocomplete,
                              copytext=copytext,
                              largetext=value,
                              icon='icon.png')

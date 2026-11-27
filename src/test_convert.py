@@ -357,7 +357,10 @@ def show(query, monkeypatch, ureg, rates=None):
     monkeypatch.setattr(convert, 'ureg', ureg)
     if rates:
         convert.register_exchange_rates(rates)
-    convert.convert(query)
+    try:
+        convert.convert(query)
+    finally:
+        ureg.disable_contexts()  # "sp ..." leaves its context enabled
     return wf.items
 
 
@@ -403,6 +406,17 @@ def test_did_you_mean(monkeypatch, workflow_ureg):
         [item] = show(query, monkeypatch, workflow_ureg)
         assert 'Did you mean' not in item['title']
         assert item.get('autocomplete') is None
+
+
+def test_tab_continues_from_result(monkeypatch, workflow_ureg):
+    """⇥ on a result starts a new query from it, in a unit that parses."""
+    for query, autocomplete in [
+            ('26.2 mi km', '42.1648128 kilometer '),
+            ('1.8 m ft+in', '70.8661417323 inch '),  # mixed: the last unit
+            ('sp 500 nm THz', 'sp 599.584916 terahertz '),  # keeps context
+            ('1 barn m^2', '1e-28 meter² ')]:
+        [item] = show(query, monkeypatch, workflow_ureg)
+        assert item['autocomplete'] == autocomplete
 
 
 def test_currency_error_names_missing_key(monkeypatch):

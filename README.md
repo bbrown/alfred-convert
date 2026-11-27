@@ -56,6 +56,7 @@ When you select a result:
 | `⌘C` | Copy the result with thousands separators                        |
 | `⌘↩` | Save the unit as a default for this dimensionality, or remove it |
 | `⌘L` | Show the result in Large Type                                    |
+| `⇥`  | Start a new query from the result, to convert it further         |
 
 Copied results leave out the unit unless you turn on `COPY_UNIT` in the [configuration sheet](#configuration), or the result has several units, such as `5 ft 10.87 in`.
 
