@@ -208,9 +208,10 @@ def quantity(number, unit):
     """
     try:
         return ureg.Quantity(number, unit)
-    # Pint's parser raises the others on half-typed units, e.g. "m/" or "m)"
+    # Pint's parser raises the others on half-typed units, e.g. "m/", "m)"
+    # or "ft-in"
     except (UndefinedUnitError, AssertionError, TokenError,
-            DefinitionSyntaxError):
+            DefinitionSyntaxError, TypeError):
         error_if_currency(unit)
         raise ValueError('Unknown unit: {}'.format(unit))
 

@@ -63,6 +63,7 @@ def test_invalid():
         '-',  # half-typed: "-40 degC degF"
         '20.5 m/',  # half-typed: "20.5 m/s kph"
         '1 m)',
+        '1 m ft-in',  # Pint raises TypeError on "+" or "-" between units
     ]
     c = convert.Converter(None)
     for query in queries:
