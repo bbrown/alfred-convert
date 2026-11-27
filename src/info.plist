@@ -231,11 +231,7 @@
 				<key>runningsubtext</key>
 				<string>Convertifying…</string>
 				<key>script</key>
-				<string>echo . &gt;&amp;2
-echo "http_proxy=$http_proxy"&gt;&amp;2
-echo "https_proxy=$https_proxy"&gt;&amp;2
-
-/usr/bin/python3 convert.py "$1"</string>
+				<string>/usr/bin/python3 convert.py "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>

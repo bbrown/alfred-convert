@@ -45,14 +45,12 @@ def main():
     data = r.json()
     all_currencies = []
     valid = []
-    invalid = set()
     for k, d in data['Data'].items():
         if k.isidentifier():  # Pint can't use e.g. "STR*" as a unit name
             all_currencies.append(Currency(k, d['CoinName']))
 
     print('%d total currencies' % len(all_currencies))
 
-    # for c in sorted(all_currencies):
     for i in range(0, len(all_currencies), 20):
         currencies = all_currencies[i:i + 20]
         url = base_url.format(reference_currency,
@@ -65,12 +63,10 @@ def main():
                 valid.append(c)
                 print('[%s] OK' % c.symbol)
             else:
-                invalid.add(c)
                 print('[%s] ERROR' % c.symbol)
 
         sleep(0.3)
 
-    # valid = [c for c in all_currencies if c.symbol not in invalid]
     with open(crypto_currencies_file, 'w', newline='', encoding='utf-8') as fp:
         w = csv.writer(fp, delimiter='\t')
         for c in sorted(valid, key=lambda t: t.symbol):

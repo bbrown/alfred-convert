@@ -102,8 +102,6 @@ def handle_delimited_query(query):
     # Currencies or decimal places
     if query.endswith(DELIMITER):  # User deleted trailing space
         run_trigger('config')
-        # subprocess.call(['osascript', '-e', ALFRED_AS])
-        # return
 
     mode, query = [s.strip() for s in query.split(DELIMITER, 1)]
 

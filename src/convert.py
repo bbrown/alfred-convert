@@ -39,7 +39,6 @@ from config import (
     CUSTOM_DEFINITIONS_FILENAME,
     DECIMAL_PLACES,
     DECIMAL_SEPARATOR,
-    DEFAULT_SETTINGS,
     DYNAMIC_DECIMALS,
     HELP_URL,
     OPENX_APP_KEY,
@@ -53,7 +52,6 @@ log = None
 
 # Pint objects
 ureg = None
-# Q = ureg.Quantity
 
 
 def open_currency_instructions():
@@ -513,7 +511,6 @@ def convert(query):
     else:
         try:
             results = c.convert(i)
-            # log.debug('results=%r', results)
         except NoToUnits:
             log.critical(u'No to_units (or defaults) for %s', i.dimensionality)
             error = u'No destination units (or defaults) for {}'.format(
@@ -592,7 +589,7 @@ def main(wf):
     if not len(wf.args):
         return
 
-    query = wf.args[0]  # .lower()
+    query = wf.args[0]
     log.debug('query : %s', query)
 
     clear_rates_if_sources_changed(wf)
@@ -628,6 +625,6 @@ def main(wf):
 
 
 if __name__ == '__main__':
-    wf = Workflow(default_settings=DEFAULT_SETTINGS, help_url=HELP_URL)
+    wf = Workflow(help_url=HELP_URL)
     log = wf.logger
     sys.exit(wf.run(main))

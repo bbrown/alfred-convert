@@ -29,17 +29,6 @@ success() {
   return 0
 }
 
-# error <arg>.. | Write red "error" and args to STDERR
-error() {
-  log $(print -P '%F{red}error%f') "$@"
-}
-
-# fail <arg>.. | Write red "error" and args to STDERR, then exit with status 1
-fail() {
-  error "$@"
-  exit 1
-}
-
 # setvar <name> <value> | Set value for variable <name>
 setvar() {
   local n=$1
@@ -87,8 +76,6 @@ test -d "$builddir" && {
 } || {
   mkdir $vopt "$builddir"
 }
-
-# mkdir $vopt "$builddir"
 
 info "copying workflow to builddir ..."
 rsync --archive $vopt \
