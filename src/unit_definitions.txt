@@ -15,3 +15,10 @@ MMscf = 28.31685 l * 1000000 = mmscf
 
 # Show years as "yr", not Pint's "a" (annum). Same definition otherwise.
 year = 365.25 * day = yr = a = julian_year
+
+# Short names people use: miles per US gallon, knots, stones and food
+# Calories
+mile_per_gallon = mile / gallon = mpg
+@alias knot = kn
+@alias stone = st
+Calorie = 1e3 * calorie = Cal

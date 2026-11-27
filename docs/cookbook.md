@@ -202,9 +202,10 @@ conv 1 t lb               → 2,204.62 lb
 conv 1 ton kg             → 907.18 kg
 conv 1 ozt g              → 31.10 g
 conv 100 kg stone+lb      → 15 stone 10.46 lb
+conv 11 st 4 lb kg        → 71.67 kg
 ```
 
-`t` is a metric tonne and `ton` a US short ton. `ozt` is a troy ounce, used for precious metals.
+`t` is a metric tonne and `ton` a US short ton. `st` is a stone. `ozt` is a troy ounce, used for precious metals.
 
 
 Temperature
@@ -229,12 +230,13 @@ Speed and pace
 conv 100 km/h mph         → 62.14 mph
 conv 60 mph kph           → 96.56 kph
 conv 20 knots km/h        → 37.04 km/h
+conv 20 kn mph            → 23.02 mph
 conv 5 min/km min/mi      → 8:03 min/mi
 conv 5 min/km km/h        → 12.00 km/h
 conv 10 mph min/mi        → 6:00 min/mi
 ```
 
-Divide a distance by a time, or use `mph`, `kph` or `knots`. A running pace is a time divided by a distance, as in the last three lines, and shows minutes and seconds. Pace and speed are inverses, and the workflow converts between them.
+Divide a distance by a time, or use `mph`, `kph`, `knots` or `kn`. A running pace is a time divided by a distance, as in the last three lines, and shows minutes and seconds. Pace and speed are inverses, and the workflow converts between them.
 
 
 Time
@@ -272,12 +274,13 @@ Energy and power
 ```text
 conv 1 kWh MJ             → 3.60 MJ
 conv 2000 kcal kJ         → 8,368.00 kJ
+conv 2000 Cal kJ          → 8,368.00 kJ
 conv 150 hp kW            → 111.85 kW
 conv 100 W BTU/h          → 341.21 Btu/h
 conv 1 boe GJ             → 6.12 GJ
 ```
 
-`kcal` is the food Calorie. `hp` is mechanical horsepower. `boe` is a barrel of oil equivalent, the energy in a barrel of crude oil.
+`kcal` or `Cal` is the food Calorie. `hp` is mechanical horsepower. `boe` is a barrel of oil equivalent, the energy in a barrel of crude oil.
 
 
 Pressure
@@ -307,8 +310,8 @@ Other compound units
 
 ```text
 conv 30 mi/gal km/l       → 12.75 km/l
-conv 30 mpg km/l          → Unknown unit: mpg
-conv 30 mi/gal l/100km    → 7.84 l/100km
+conv 30 mpg km/l          → 12.75 km/l
+conv 30 mpg l/100km       → 7.84 l/100km
 conv 1 g/cm^3 kg/m^3      → 1,000.00 kg/m³
 conv 10 gal/min l/s       → 0.63 l/s
 conv 1 g0 m/s^2           → 9.81 m/s²
@@ -317,7 +320,7 @@ conv 30 kWh/100mi kWh/100km → 18.64 kWh/100km
 conv 50 Hz ms             → 20.00 ms
 ```
 
-Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow divides 1 by the number to convert between them. It does the same for any units that are inverses, such as a frequency (`Hz`) and the time of one cycle (`ms`). `g0` is standard gravity. A unit can include a number, such as `l/100km` for litres per 100 km or `kWh/100mi` for an electric car's consumption.
+`mpg` is miles per US gallon, the same as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow divides 1 by the number to convert between them. It does the same for any units that are inverses, such as a frequency (`Hz`) and the time of one cycle (`ms`). `g0` is standard gravity. A unit can include a number, such as `l/100km` for litres per 100 km or `kWh/100mi` for an electric car's consumption.
 
 
 Currencies
