@@ -2,6 +2,18 @@
 Changelog
 =========
 
+### 3.9.0 ###
+
+Unreleased
+
+- Speed up conversions that don't involve a currency by about 30%
+- Remove the docopt library
+- Fix small results losing a digit, e.g. `15 mm m` showed `0.01` instead of `0.015`
+- Fix lowercase `php`, `myr`, `khr` and `kyd` converting as picohorsepower, milliyear, kilohour and kiloyard instead of currencies
+- Fix half-typed queries (e.g. `-` or `20.5 m/`) showing a raw Python or workflow error
+- Fix a setting that isn't a whole number (e.g. `DECIMAL_PLACES=2.5`) stopping the workflow: `DECIMAL_PLACES`, `CURRENCY_DECIMAL_PLACES` and `UPDATE_INTERVAL` now fall back to their defaults
+
+
 ### [3.8.0][v3.8.0] ###
 
 Released 2026-11-25
