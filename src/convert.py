@@ -433,7 +433,7 @@ class Converter:
         """
         ctx = []
         for c in query:
-            if c in 'abcdefghijklmnopqrstuvwxyz':
+            if c.isalpha():
                 ctx.append(c)
             else:
                 break

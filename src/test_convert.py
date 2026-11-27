@@ -114,6 +114,17 @@ def test_mixed_input():
             c.parse(query)
 
 
+def test_contexts():
+    """A context's name can start with a capital, e.g. "Gaussian"."""
+    c = convert.Converter(None)
+    try:
+        assert c.parse('Gau 1 T G').context == 'Gau'
+        [conv] = c.convert(c.parse('Gau 1 T G'))
+        assert conv.to_number == pytest.approx(10000)
+    finally:
+        convert.ureg.disable_contexts()
+
+
 def test_number_formats():
     """Scientific notation, fractions and the web's minus sign "−"."""
     c = convert.Converter(None)

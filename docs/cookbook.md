@@ -393,9 +393,10 @@ conv sp 500 nm THz           → 599.58 THz
 conv sp 2.5 eV nm            → 495.94 nm
 conv spectroscopy 1Å eV      → 12,398.42 eV
 conv boltzmann 300 K meV     → 25.85 meV
+conv Gau 1 T G               → 10,000.00 G
 ```
 
-`spectroscopy`, or `sp` for short, links wavelength, frequency and photon energy. `boltzmann` links temperature and energy. The workflow reads lowercase letters before the number as a context name, so contexts whose names start with a capital, such as `Gaussian`, don't work.
+`spectroscopy`, or `sp` for short, links wavelength, frequency and photon energy. `boltzmann` links temperature and energy. `Gaussian`, or `Gau`, converts SI electromagnetic units, such as teslas, to Gaussian units, such as gauss. The workflow reads the letters before the number as a context name.
 
 
 Your own units
@@ -425,7 +426,7 @@ conv 5 ft 10 kg m         → Can't add kg to ft
 conv 5 m / s kph          → Unknown unit: /
 ```
 
-- A query must start with a number. The workflow reads lowercase letters before the number as a [context](#contexts) name.
+- A query must start with a number. The workflow reads letters before the number as a [context](#contexts) name.
 - If the workflow doesn't know a unit, check the spelling or look it up in Pint's [list of units][pintunits].
 - You can only convert between units of the same kind. The message shows each unit's dimensionality.
 - Don't put spaces inside a unit: write `m/s`.
