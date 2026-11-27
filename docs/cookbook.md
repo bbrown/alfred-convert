@@ -226,7 +226,7 @@ conv 300 K degC                  → 26.85 °C
 conv 10 delta_degC delta_degF    → 18.00 Δ°F
 ```
 
-Write degrees as `degC`, `°C` or `celsius`, and the same way for Fahrenheit. `K` is kelvin. These convert a temperature from one scale to another. To convert a change in temperature, such as a rise of 10 °C, use `delta_degC` and `delta_degF`.
+Write degrees as `degC`, `°C` or `celsius`, and the same way for Fahrenheit. `K` is kelvin. These convert a temperature from one scale to another. To convert a change in temperature, such as a rise of 10 °C, use `delta_degC` and `delta_degF`. A temperature below absolute zero still converts, but the result's subtitle points out that it's colder than physics allows.
 
 
 Speed and pace

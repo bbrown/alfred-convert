@@ -670,6 +670,13 @@ def subtitle(conv, f):
             return '≈ {}{} {}'.format(whole or '',
                                       KITCHEN_FRACTIONS.get(part, ''),
                                       symbol(conv.to_unit))
+
+    # A change in temperature (delta_degC) can be negative
+    if (conv.dimensionality == '[temperature]' and
+            'delta' not in conv.from_unit):
+        kelvin = ureg.Quantity(conv.from_number, conv.from_unit).to('K')
+        if kelvin.magnitude < 0:
+            return 'Below absolute zero: colder than physics allows'
     return ''
 
 

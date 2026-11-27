@@ -382,6 +382,17 @@ def test_kitchen_fractions(monkeypatch, workflow_ureg):
         assert (item['title'], item['subtitle']) == (title, subtitle)
 
 
+def test_below_absolute_zero(monkeypatch, workflow_ureg):
+    """Temperatures below absolute zero convert, with a warning."""
+    for query, subtitle in [
+            ('-300 degC K', 'Below absolute zero: colder than physics allows'),
+            ('-5 K degC', 'Below absolute zero: colder than physics allows'),
+            ('-40 degC degF', ''),
+            ('-300 delta_degC delta_degF', '')]:  # a change, not a reading
+        [item] = show(query, monkeypatch, workflow_ureg)
+        assert item['subtitle'] == subtitle
+
+
 def test_currency_error_names_missing_key(monkeypatch):
     """Unknown currencies say which API key would add them."""
     shown = []
