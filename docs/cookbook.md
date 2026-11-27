@@ -237,9 +237,10 @@ conv 1 kWh MJ             → 3.60 megajoule
 conv 2000 kcal kJ         → 8,368.00 kilojoule
 conv 150 hp kW            → 111.85 kilowatt
 conv 100 W BTU/h          → 341.21 british_thermal_unit/hour
+conv 1 boe GJ             → 6.12 gigajoule
 ```
 
-`kcal` is the food Calorie. `hp` is mechanical horsepower.
+`kcal` is the food Calorie. `hp` is mechanical horsepower. `boe` is a barrel of oil equivalent, the energy in a barrel of crude oil.
 
 
 Pressure

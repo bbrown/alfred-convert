@@ -7,8 +7,8 @@
 # data directory. You can edit this file by entering "convinfo"
 # in Alfred and selecting "Edit Custom Units".
 
-# Barrel of oil equivalent
-barrel_of_oil_equivalent = 169.902 m**3 = boe
+# Barrel of oil equivalent: the energy in a barrel of crude oil
+barrel_of_oil_equivalent = 5.8e6 Btu = boe
 
 # Million standard cubic feet
 MMscf = 28.31685 l * 1000000 = mmscf
