@@ -127,6 +127,19 @@ def test_thousands_separators():
         c.parse_quantity('1.5 m')
 
 
+def test_units_with_numbers():
+    """A unit can hold a number: "l/100km" is liters per 100 km."""
+    c = convert.Converter(None)
+    i = c.parse('7 l/100km l/km')
+    assert (i.number, i.from_unit) == (pytest.approx(0.07), 'liter/kilometer')
+    [conv] = c.convert(c.parse('30 kWh/100mi kWh/100km'))
+    assert conv.to_unit == 'kWh/100km'  # as typed: Pint's name drops 100
+    assert conv.to_number == pytest.approx(18.64, abs=0.01)
+    for query in ('2 m to 3', '1 l/0km l/km', '.5.5 m'):
+        with pytest.raises(ValueError, match='Unknown unit'):
+            c.parse(query)
+
+
 def test_conversion():
     """Test conversions."""
     data = [

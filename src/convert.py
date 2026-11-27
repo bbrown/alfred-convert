@@ -222,23 +222,38 @@ Conversion = namedtuple(
 def quantity(number, unit):
     """Return ``ureg.Quantity(number, unit)``.
 
+    ``unit`` may contain a number, e.g. "l/100km" (liters per 100 km), so
+    the quantity's magnitude is ``number`` times its scale.
+
     Raises:
         ValueError: Raised if ``unit`` is unknown or half-typed, e.g. "m/".
 
     """
     try:
-        return ureg.Quantity(number, unit)
-    # Pint's parser raises the others on half-typed units, e.g. "m/", "m)"
-    # or "ft-in"
+        try:
+            return ureg.Quantity(number, unit)
+        except ValueError:  # Pint won't take a number in a unit
+            # It reads "l/100km" as (l/100)*km, so wrap what follows "/"
+            scaled = ureg.parse_expression(re.sub(
+                r'/(\d+(?:\.\d+)?)\s*([^\W\d]\w*)', r'/(\1 \2)', unit))
+            if isinstance(scaled, ureg.Quantity):  # not just a number, "3"
+                return number * scaled
+    # Pint's parser raises the others on half-typed units, e.g. "m/", "m)",
+    # "ft-in" or "l/0"
     except (UndefinedUnitError, AssertionError, TokenError,
-            DefinitionSyntaxError, TypeError):
-        error_if_currency(unit)
-        raise ValueError('Unknown unit: {}'.format(unit))
+            DefinitionSyntaxError, TypeError, ZeroDivisionError):
+        pass
+    error_if_currency(unit)
+    raise ValueError('Unknown unit: {}'.format(unit))
 
 
 def symbol(unit):
     """Return the short name to show for ``unit``, e.g. "°F" for "degF"."""
-    return '{:~P}'.format(ureg.Unit(unit)) or str(unit)  # "" if dimensionless
+    try:
+        # Pint formats dimensionless as ""
+        return '{:~P}'.format(ureg.Unit(unit)) or str(unit)
+    except ValueError:  # a number in the unit, e.g. "l/100km": show as typed
+        return unit
 
 
 class Converter:
@@ -290,7 +305,7 @@ class Converter:
         results = []
         qty = ureg.Quantity(i.number, i.from_unit)
         for u in units:
-            to_unit = quantity(1, u)
+            to_unit = quantity(1, u)  # magnitude 0.01 for "l/100km"
 
             # Skip defaults that are the input unit under another name,
             # e.g. a saved "degF" when the input is "degree_Fahrenheit"
@@ -300,7 +315,8 @@ class Converter:
             conv = qty.to(to_unit)
             log.debug('[convert] %s -> %s = %s', i.from_unit, u, conv)
             results.append(Conversion(i.number, i.from_unit,
-                                      conv.magnitude, u, i.dimensionality))
+                                      conv.magnitude / to_unit.magnitude, u,
+                                      i.dimensionality))
 
         if not results:
             raise NoToUnits()
@@ -339,8 +355,7 @@ class Converter:
         from_unit, to_units = self.parse_units(tail, qty)
 
         i = Input(from_unit.magnitude, str(from_unit.dimensionality),
-                  str(from_unit.units),
-                  [str(u.units) for u in to_units] or None, ctx)
+                  str(from_unit.units), to_units or None, ctx)
 
         log.debug('[parser] %s', i)
 
@@ -422,8 +437,8 @@ class Converter:
             qty (int, optional): Quantity of from units
 
         Returns:
-            (pint.Quantity, list): From quantity, and a quantity of 1 of
-                each to unit.
+            (pint.Quantity, list): From quantity, and Pint's name for each
+                to unit.
 
         Raises:
             ValueError: Raised if a unit is unknown.
@@ -434,7 +449,12 @@ class Converter:
         if len(units) > 2 and units[1] in ('to', 'in', 'as', '->', '='):
             del units[1]
         log.debug('[parser] from_unit=%s, to_units=%s', units[0], units[1:])
-        return quantity(qty, units[0]), [quantity(1, u) for u in units[1:]]
+        to_units = []
+        for u in units[1:]:
+            q = quantity(1, u)
+            # Keep "l/100km" as typed: Pint's name would drop the 100
+            to_units.append(str(q.units) if q.magnitude == 1 else u)
+        return quantity(qty, units[0]), to_units
 
 
 def register_units():

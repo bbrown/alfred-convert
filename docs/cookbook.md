@@ -304,9 +304,11 @@ conv 30 mi/gal l/km       → Can't convert from mi/gal 1 / [length] ** 2 to l/k
 conv 1 g/cm^3 kg/m^3      → 1,000.00 kg/m³
 conv 10 gal/min l/s       → 0.63 l/s
 conv 1 g0 m/s^2           → 9.81 m/s²
+conv 0.07 l/km l/100km    → 7.00 l/100km
+conv 30 kWh/100mi kWh/100km → 18.64 kWh/100km
 ```
 
-Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow can't convert between them, or to litres per 100 km. `g0` is standard gravity.
+Pint has no `mpg`, so write fuel economy as `mi/gal`. Litres per kilometre is the inverse of kilometres per litre, so the workflow can't convert between them. `g0` is standard gravity. A unit can include a number, such as `l/100km` for litres per 100 km or `kWh/100mi` for an electric car's consumption.
 
 
 Currencies
