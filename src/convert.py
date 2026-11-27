@@ -202,8 +202,12 @@ class Formatter:
 
     def formatted(self, n, unit=None, thousands=True):
         """Format number with separators, and ``unit`` as its symbol."""
-        sep = ',' if thousands and self.thousands_separator else ''
-        num = '{:{}.{}f}'.format(n, sep, self._decimal_places(n))
+        if self.dynamic_decimals and 0 < abs(n) < 1e-9:
+            # 10 decimal places can't show 2 significant digits
+            num = '{:.{}e}'.format(n, self.decimal_places)
+        else:
+            sep = ',' if thousands and self.thousands_separator else ''
+            num = '{:{}.{}f}'.format(n, sep, self._decimal_places(n))
         # One pass, so swapping "," and "." (e.g. 1.234,50) works
         num = num.translate({ord(','): self.thousands_separator,
                              ord('.'): self.decimal_separator})

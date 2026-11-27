@@ -166,6 +166,9 @@ def test_formatter():
     assert f.formatted(0.004) == '0.004'
     assert f.formatted(0.015) == '0.015'
     assert f.formatted(0.0046) == '0.0046'
+    assert f.formatted(1.5e-9) == '0.0000000015'
+    assert f.formatted(1e-28) == '1.00e-28'  # not "0.00"
+    assert f.formatted(-5e-10) == '-5.00e-10'
 
     f = convert.Formatter(2, ',', '.', dynamic_decimals=False)
     assert f.formatted(1234.5, 'm') == '1.234,50 m'

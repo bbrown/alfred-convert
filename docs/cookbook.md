@@ -51,12 +51,13 @@ The space between the number and the unit is optional. If you leave out the unit
 Reading the results
 -------------------
 
-A result shows the number and the unit's symbol, so `miles` comes back as `mi`. Numbers have 2 decimal places and a `,` between thousands. Small results get extra decimal places, up to 10, so they don't round to zero:
+A result shows the number and the unit's symbol, so `miles` comes back as `mi`. Numbers have 2 decimal places and a `,` between thousands. Small results get extra decimal places, up to 10, so they don't round to zero. Even smaller results use scientific notation:
 
 ```text
 conv 1 km mm              → 1,000,000.00 mm
 conv 15 mm m              → 0.015 m
 conv 1 mm km              → 0.000001 km
+conv 1 barn m^2           → 1.00e-28 m²
 ```
 
 To change how numbers look, set `DECIMAL_PLACES`, `DYNAMIC_DECIMALS`, `DECIMAL_SEPARATOR` and `THOUSANDS_SEPARATOR` in the [configuration sheet](../README.md#configuration). [Usage](../README.md#usage) lists the keys for copying a result, saving a default and Large Type.
