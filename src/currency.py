@@ -85,41 +85,13 @@ def load_cryptocurrency_rates(symbols):
         return {}
 
     # API errors arrive as HTTP 200 JSON, so keep only requested symbols
-    rates = {sym: data[sym] for sym in symbols if sym in data}
-    for sym, rate in rates.items():
-        log.debug('[CryptoCompare.com] 1 %s = %s %s',
-                  REFERENCE_CURRENCY, rate, sym)
-
-    return rates
+    return {sym: data[sym] for sym in symbols if sym in data}
 
 
-def load_xra_rates(symbols):
-    """Return dict of exchange rates from exchangerate-api.com.
-
-    Returns:
-        dict: `{symbol: rate}` mapping of exchange rates.
-
-    """
-    rates = {}
-    wanted = set(symbols)
-    url = XRA_API_URL.format(REFERENCE_CURRENCY)
-    r = web.get(url, headers={'User-Agent': USER_AGENT})
-    r.raise_for_status()
-    log.debug('[%s] %s', r.status_code, url)
-    data = r.json()
-
-    for sym, rate in data['rates'].items():
-        if sym not in wanted:
-            continue
-        log.debug('[ExchangeRate-API.com] 1 %s = %s %s',
-                  REFERENCE_CURRENCY, rate, sym)
-        rates[sym] = rate
-
-    return rates
-
-
-def load_openx_rates(symbols):
+def load_fiat_rates(symbols):
     """Return dict of exchange rates from openexchangerates.org.
+
+    Without APP_KEY, the rates come from the free exchangerate-api.com.
 
     Args:
         symbols (sequence): Abbreviations of currencies to fetch
@@ -129,31 +101,13 @@ def load_openx_rates(symbols):
         dict: `{symbol: rate}` mapping of exchange rates.
 
     """
-    rates = {}
-    wanted = set(symbols)
-    if not OPENX_APP_KEY:
-        log.warning(
-            'not fetching fiat currency exchange rates: '
-            'APP_KEY for openexchangerates.org not set. '
-            'Please sign up for a free account here: '
-            'https://openexchangerates.org/signup/free'
-        )
-        return rates
-
-    url = OPENX_API_URL.format(OPENX_APP_KEY)
+    url = (OPENX_API_URL.format(OPENX_APP_KEY) if OPENX_APP_KEY else
+           XRA_API_URL.format(REFERENCE_CURRENCY))
     r = web.get(url, headers={'User-Agent': USER_AGENT})
     r.raise_for_status()
-    log.debug('[%s] %s', r.status_code, OPENX_API_URL.format('XXX'))
-    data = r.json()
-
-    for sym, rate in data['rates'].items():
-        if sym not in wanted:
-            continue
-        log.debug('[OpenExchangeRates.org] 1 %s = %s %s',
-                  REFERENCE_CURRENCY, rate, sym)
-        rates[sym] = rate
-
-    return rates
+    log.debug('[%s] %s', r.status_code, url.split('?')[0])  # no APP_KEY
+    wanted = set(symbols)
+    return {s: rate for s, rate in r.json()['rates'].items() if s in wanted}
 
 
 def load_active_currencies():
@@ -201,9 +155,7 @@ def fetch_exchange_rates():
             'Please sign up for a free account here: '
             'https://openexchangerates.org/signup/free'
         )
-        jobs = [(load_xra_rates, (syms,))]
-    else:
-        jobs = [(load_openx_rates, (syms,))]
+    jobs = [(load_fiat_rates, (syms,))]
 
     syms = []
     for s, name in CRYPTO_CURRENCIES.items():

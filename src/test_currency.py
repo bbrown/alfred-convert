@@ -64,6 +64,22 @@ def test_crypto_rates_are_optional(monkeypatch):
     assert currency.fetch_exchange_rates() == {'EUR': 0.9}
 
 
+def test_app_key_picks_fiat_source(monkeypatch):
+    """With APP_KEY, fiat rates come from openexchangerates.org."""
+    urls = []
+
+    def fake_get(url, headers=None, **kwargs):
+        urls.append(url)
+        return FakeResponse({'rates': {'EUR': 0.9, 'GBP': 0.8}})
+
+    monkeypatch.setattr(currency.web, 'get', fake_get)
+    for key, host in (('secret', 'openexchangerates.org'),
+                      (None, 'exchangerate-api.com')):
+        monkeypatch.setattr(currency, 'OPENX_APP_KEY', key)
+        assert currency.load_fiat_rates(['EUR']) == {'EUR': 0.9}
+        assert host in urls[-1]
+
+
 def test_currency_symbols_are_unit_names():
     """Pint can't use symbols such as "STR*" as unit names."""
     symbols = list(currency.CURRENCIES) + list(currency.CRYPTO_CURRENCIES)
