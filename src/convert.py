@@ -11,6 +11,7 @@
 
 from collections import namedtuple
 from datetime import timedelta
+import difflib
 from fractions import Fraction
 import functools
 import math
@@ -259,6 +260,7 @@ def quantity(number, unit):
         ValueError: Raised if ``unit`` is unknown or half-typed, e.g. "m/".
 
     """
+    name = None  # the unknown name in unit, e.g. "ftt" in "ftt/s"
     try:
         try:
             return ureg.Quantity(number, unit)
@@ -268,13 +270,37 @@ def quantity(number, unit):
                 r'/(\d+(?:\.\d+)?)\s*([^\W\d]\w*)', r'/(\1 \2)', unit))
             if isinstance(scaled, ureg.Quantity):  # not just a number, "3"
                 return number * scaled
+    except UndefinedUnitError as err:
+        name = err.unit_names  # a str or a tuple
+        name = name if isinstance(name, str) else name[0]
     # Pint's parser raises the others on half-typed units, e.g. "m/", "m)",
     # "ft-in" or "l/0"
-    except (UndefinedUnitError, AssertionError, TokenError,
-            DefinitionSyntaxError, TypeError, ZeroDivisionError):
+    except (AssertionError, TokenError, DefinitionSyntaxError, TypeError,
+            ZeroDivisionError):
         pass
     error_if_currency(unit)
-    raise ValueError('Unknown unit: {}'.format(unit))
+    raise UnknownUnit(unit, name)
+
+
+class UnknownUnit(ValueError):
+    """Raised for an unknown unit. Suggests a known one if one is close.
+
+    Attributes:
+        fix (tuple): ``(name, suggestion)``, e.g. ``('ftt', 'ft')``, or
+            ``None`` if no known unit is close.
+
+    """
+
+    def __init__(self, unit, name=None):
+        """``name`` is the unknown name in ``unit``, e.g. "ftt" in "ftt/s"."""
+        msg = 'Unknown unit: {}'.format(unit)
+        close = []
+        if name and len(name) > 2:  # "f" or "to" is likely half-typed
+            close = difflib.get_close_matches(name, list(ureg), 1)
+        self.fix = (name, close[0]) if close else None
+        if close:
+            msg += '. Did you mean {}?'.format(close[0])
+        super().__init__(msg)
 
 
 def split(total, units, places):
@@ -682,7 +708,7 @@ def subtitle(conv, f):
 
 def convert(query):
     """Perform conversion and send results to Alfred."""
-    error = None
+    error = fix = None
     results = None
 
     defs = Defaults(wf)
@@ -693,6 +719,7 @@ def convert(query):
     except ValueError as err:
         log.critical('invalid query (%s): %s', query, err)
         error = str(err)
+        fix = getattr(err, 'fix', None)  # from UnknownUnit
 
     else:
         try:
@@ -715,7 +742,15 @@ def convert(query):
     if not error and not results:
         error = 'Conversion input not understood'
 
-    if error:  # Show error
+    if error and fix:  # ↩ or ⇥ puts the suggested unit in the query
+        name, suggestion = fix
+        wf.add_item(error,
+                    'Press ↩ or ⇥ to use {}'.format(suggestion),
+                    autocomplete=re.sub(r'\b{}\b'.format(re.escape(name)),
+                                        suggestion, query, count=1),
+                    valid=False, icon=ICON_WARNING)
+
+    elif error:  # Show error
         wf.add_item(error,
                     'For example: 2.5cm in  |  178lb kg  |  200m/s mph',
                     valid=False, icon=ICON_WARNING)

@@ -393,6 +393,18 @@ def test_below_absolute_zero(monkeypatch, workflow_ureg):
         assert item['subtitle'] == subtitle
 
 
+def test_did_you_mean(monkeypatch, workflow_ureg):
+    """An unknown unit suggests a close one, and ↩ or ⇥ puts it in."""
+    [item] = show('3 furlongz/fortnight m/s', monkeypatch, workflow_ureg)
+    assert item['title'] == (
+        'Unknown unit: furlongz/fortnight. Did you mean furlong?')
+    assert item['autocomplete'] == '3 furlong/fortnight m/s'
+    for query in ('3 xyzzy m', '2 m to'):  # nothing close; half-typed
+        [item] = show(query, monkeypatch, workflow_ureg)
+        assert 'Did you mean' not in item['title']
+        assert item.get('autocomplete') is None
+
+
 def test_currency_error_names_missing_key(monkeypatch):
     """Unknown currencies say which API key would add them."""
     shown = []

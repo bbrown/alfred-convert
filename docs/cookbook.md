@@ -456,14 +456,14 @@ When something goes wrong
 
 ```text
 conv km m                 → Unknown context: km
-conv 3 furlongz m         → Unknown unit: furlongz
+conv 3 furlongz m         → Unknown unit: furlongz. Did you mean furlong?
 conv 1 m s                → Can't convert from m (length) to s (time)
 conv 5 ft 10 kg m         → Can't add kg to ft
 conv 5 m / s kph          → Unknown unit: /
 ```
 
 - A query must start with a number. The workflow reads letters before the number as a [context](#contexts) name.
-- If the workflow doesn't know a unit, check the spelling or look it up in Pint's [list of units][pintunits].
+- If the workflow doesn't know a unit, it suggests the closest one it knows, and pressing `↩` or `⇥` puts that in your query. Otherwise, check the spelling or look the unit up in Pint's [list of units][pintunits].
 - You can only convert between units of the same kind. The message shows each unit's dimensionality.
 - Don't put spaces inside a unit: write `m/s`.
 
