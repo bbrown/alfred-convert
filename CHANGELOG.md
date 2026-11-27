@@ -6,12 +6,36 @@ Changelog
 
 Unreleased
 
+- Write `to`, `in`, `as`, `->` or `=` between units, and `per` for `/`, e.g. `conv 26.2 mi to km` or `conv 60 miles per hour kph`
+- Convert to several units at once, e.g. `conv 1 kg lb oz`
+- Convert mixed amounts such as `5 ft 10 in`, `5'10"` or `1h30min`, and show results in mixed units joined with `+`: `conv 1.8 m ft+in` shows `5 ft 10.87 in`
+- Read fractions, vulgar fractions and scientific notation, e.g. `1/2 cup`, `1½ cups` or `1e3 m`, and the minus sign `−` that web pages use
+- Read the currency symbols `$`, `€`, `£`, `¥`, `₹` and `₿`, e.g. `conv $100 eur`
+- Allow a number in a unit, e.g. `l/100km` or `kWh/100mi`
+- Convert between reciprocal units, such as pace and speed (`5 min/km km/h`) or fuel economy and consumption (`30 mpg l/100km`)
+- Allow contexts whose names start with a capital, such as `Gaussian`
+- Show unit symbols in results, e.g. `°F` and `km/h` instead of `degree_Fahrenheit` and `kilometer_per_hour`
+- Show a pace in minutes and seconds, e.g. `8:03 min/mi`, and tiny results in scientific notation instead of `0.00`
+- Show the exchange rate and its age under currency results
+- Show the nearest measuring cup or spoon amount under results in cups, tablespoons and teaspoons
+- Point out temperatures below absolute zero
+- Suggest the closest unit for an unknown one: `↩` or `⇥` puts it in the query
+- Press `⇥` on a result to convert it further
+- Name dimensionalities in messages, e.g. `density` instead of `[mass] / [length] ** 3`
+- Add default units for length, mass, temperature, area, volume, speed, time and currency, until you save your own
+- Add the units `mpg`, `kn`, `st` and `Cal`, the cooking units `pinch`, `dash`, `drop`, `jigger` and `stick`, the counting units `dozen`, `bakers_dozen`, `score` and `gross`, and, just for fun, `smoot`, `banana`, `football_field`, `olympic_pool`, `beard_second`, `sheppey`, `light_second`, `firkin` and `cubit`
+- `boe` is now energy (5.8 million Btu), not a volume of gas, so `1 boe GJ` works but `1 MMscf boe` no longer does
 - Speed up conversions that don't involve a currency by about 30%
 - Remove the docopt library
 - Fix small results losing a digit, e.g. `15 mm m` showed `0.01` instead of `0.015`
 - Fix lowercase `php`, `myr`, `khr` and `kyd` converting as picohorsepower, milliyear, kilohour and kiloyard instead of currencies
 - Fix half-typed queries (e.g. `-` or `20.5 m/`) showing a raw Python or workflow error
+- Fix `+` or `-` between units (e.g. `1 m ft-in`) showing a raw Python error
 - Fix a setting that isn't a whole number (e.g. `DECIMAL_PLACES=2.5`) stopping the workflow: `DECIMAL_PLACES`, `CURRENCY_DECIMAL_PLACES` and `UPDATE_INTERVAL` now fall back to their defaults
+- Fix a saved default that no longer exists, such as an inactive currency, stopping the workflow
+- Fix `1,5 m cm` converting 15 m: a thousands separator now needs 3 digits after it
+- Fix Réaumur conversions: 80 °Re is 100 °C, not 64 °C
+- Fix `1 pinch ml` converting picoinches, and `1 drop ml` asking for `CRYPTO_API_KEY`
 - Add a [cookbook](./docs/cookbook.md) of example conversions and tips for writing queries
 
 
