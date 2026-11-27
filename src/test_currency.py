@@ -96,3 +96,11 @@ def test_currency_docs_match_config():
         set(config.CURRENCIES) | set(config.CRYPTO_CURRENCIES))
     assert {s for s, name in rows if name.endswith('\\*')} == (
         config.OPENX_ONLY_CURRENCIES)
+
+
+def test_bad_number_setting_uses_default(monkeypatch):
+    """A typo such as UPDATE_INTERVAL=2.5 mustn't stop the workflow."""
+    monkeypatch.setenv('UPDATE_INTERVAL', '2.5')
+    assert config._int('UPDATE_INTERVAL', 360) == 360
+    monkeypatch.setenv('UPDATE_INTERVAL', '60')
+    assert config._int('UPDATE_INTERVAL', 360) == 60

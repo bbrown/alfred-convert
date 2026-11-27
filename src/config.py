@@ -13,12 +13,20 @@
 import os
 import shutil
 
+
+def _int(name, default):
+    """Return environment variable ``name`` as an int, else ``default``."""
+    try:
+        return int(os.getenv(name) or default)
+    except ValueError:  # e.g. "2.5": a typo mustn't stop the workflow
+        return default
+
+
 # ----------------------------------------------------------------------
 # Result display
 # ----------------------------------------------------------------------
-DECIMAL_PLACES = int(os.getenv('DECIMAL_PLACES') or '2')
-CURRENCY_DECIMAL_PLACES = int(os.getenv('CURRENCY_DECIMAL_PLACES') or
-                              str(DECIMAL_PLACES))
+DECIMAL_PLACES = _int('DECIMAL_PLACES', 2)
+CURRENCY_DECIMAL_PLACES = _int('CURRENCY_DECIMAL_PLACES', DECIMAL_PLACES)
 DECIMAL_SEPARATOR = os.getenv('DECIMAL_SEPARATOR') or '.'
 THOUSANDS_SEPARATOR = os.getenv('THOUSANDS_SEPARATOR') or ''
 
@@ -34,7 +42,7 @@ OPENX_APP_KEY = os.getenv('APP_KEY') or None
 # API key for CryptoCompare.com (optional: no crypto rates without it)
 CRYPTO_API_KEY = os.getenv('CRYPTO_API_KEY') or None
 # Update interval (default 6 hours)
-CURRENCY_CACHE_AGE = int(os.getenv('UPDATE_INTERVAL') or '360') * 60
+CURRENCY_CACHE_AGE = _int('UPDATE_INTERVAL', 360) * 60
 
 CURRENCY_CACHE_NAME = 'exchange_rates'
 CURRENCY_ATTEMPT_CACHE_NAME = 'rates_attempt'
