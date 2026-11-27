@@ -88,6 +88,22 @@ def test_valid():
         assert c.parse(t[0])[:4] == t[1]  # all fields but context
 
 
+def test_thousands_separators():
+    """A thousands separator needs 3 digits after it, so "1,5" isn't 15."""
+    c = convert.Converter(None)
+    assert c.parse_quantity('1,500.5 m') == (1500.5, 'm')
+    assert c.parse_quantity('-.5m') == (-0.5, 'm')
+    for query in ('1,5 m', '1,5000 m', '1,500,00 m'):
+        with pytest.raises(ValueError):
+            c.parse_quantity(query)
+
+    c = convert.Converter(None, decimal_separator=',',
+                          thousands_separator='.')
+    assert c.parse_quantity('1.500,5 m') == (1500.5, 'm')
+    with pytest.raises(ValueError):
+        c.parse_quantity('1.5 m')
+
+
 def test_conversion():
     """Test conversions."""
     data = [

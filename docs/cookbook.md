@@ -65,13 +65,19 @@ To change how numbers look, set `DECIMAL_PLACES`, `DYNAMIC_DECIMALS`, `DECIMAL_S
 Writing numbers
 ---------------
 
-Use `.` for decimals. The workflow ignores thousands separators, and a leading `-` makes a number negative:
+Use `.` for decimals and `,` between thousands. A leading `-` makes a number negative:
 
 ```text
 conv 2.5 cm in            → 0.98 in
 conv .5 m cm              → 50.00 cm
 conv 1,500 m km           → 1.50 km
 conv -40 degC degF        → -40.00 °F
+```
+
+A `,` needs 3 digits after it, so the workflow won't quietly read `1,5` as 15:
+
+```text
+conv 1,5 m cm             → Use "." for decimals and "," between thousands
 ```
 
 If you change `DECIMAL_SEPARATOR` or `THOUSANDS_SEPARATOR`, write numbers that way, e.g. `2,5` with a `,` decimal separator. There's no scientific notation: see [When something goes wrong](#when-something-goes-wrong).

@@ -11,6 +11,7 @@
 
 from collections import namedtuple
 import os
+import re
 import sys
 from tokenize import TokenError
 
@@ -375,29 +376,25 @@ class Converter:
             (float, str): Quantity and remainder of query, or
                 ``(None, '')`` if the query doesn't start with a number.
 
-        """
-        qty = []
-        qtychars = ('+-1234567890' + self.thousands_separator +
-                    self.decimal_separator)
-        for c in query:
-            if c in qtychars:
-                if c == '+':
-                    qty.append('')
-                elif c == self.thousands_separator:
-                    log.debug('ignored thousands separator "%s"', c)
-                    # Append an empty string so qty length is correct
-                    qty.append('')
-                elif c == self.decimal_separator:
-                    qty.append('.')
-                else:
-                    qty.append(c)
-            else:
-                break
+        Raises:
+            ValueError: Raised if a thousands separator isn't followed by
+                3 digits, e.g. "1,5", which is likely a decimal.
 
-        try:
-            return float(''.join(qty)), query[len(qty):].strip()
-        except ValueError:  # no number, or half of one, e.g. "-" or "1.2."
+        """
+        t = self.thousands_separator
+        d = self.decimal_separator
+        # A digit first or after the decimal separator: "5", ".5", "1,500.5"
+        m = re.match(r'[-+]?(?={d}?\d)\d*(?:{t}\d{{3}}(?!\d))*(?:{d}\d*)?'
+                     .format(t=re.escape(t), d=re.escape(d)), query)
+        if not m:
             return None, ''
+
+        if t and re.match(re.escape(t) + r'\d', query[m.end():]):
+            raise ValueError('Use "{}" for decimals and "{}" between '
+                             'thousands'.format(d, t))
+
+        number = m.group().replace(t, '').replace(d, '.')
+        return float(number), query[m.end():].strip()
 
     def parse_units(self, query, qty=1):
         """Extract from and (optional) to units from query.
