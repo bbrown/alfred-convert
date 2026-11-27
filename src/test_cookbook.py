@@ -88,6 +88,9 @@ class FakeWorkflow(object):
     def send_feedback(self):
         pass
 
+    def cached_data_age(self, name):
+        return 0
+
 
 @pytest.fixture(scope='module')
 def ureg():

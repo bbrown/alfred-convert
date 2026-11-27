@@ -10,6 +10,7 @@
 """Drives Script Filter to show unit conversions in Alfred 3."""
 
 from collections import namedtuple
+from datetime import timedelta
 import functools
 import math
 import os
@@ -49,6 +50,7 @@ from config import (
     THOUSANDS_SEPARATOR,
 )
 from defaults import Defaults
+from info import human_timedelta
 
 log = None
 
@@ -636,6 +638,26 @@ def register_exchange_rates(exchange_rates):
             log.error('skipping currency %r : %s', definition, err)
 
 
+def subtitle(conv, f):
+    """Return more about ``conv`` for its result's subtitle, or "".
+
+    Args:
+        conv (Conversion): Result to describe.
+        f (Formatter): Formatter for the result's numbers.
+
+    """
+    if conv.dimensionality == '[currency]' and conv.from_number:
+        text = '1 {} = {}'.format(
+            symbol(conv.from_unit),
+            f.formatted(conv.to_number / conv.from_number, conv.to_unit))
+        age = wf.cached_data_age(CURRENCY_CACHE_NAME)
+        if age:
+            text += ' · rates updated ' + human_timedelta(
+                timedelta(seconds=age))
+        return text
+    return ''
+
+
 def convert(query):
     """Perform conversion and send results to Alfred."""
     error = None
@@ -690,6 +712,7 @@ def convert(query):
                               show_unit=COPY_UNIT)
 
             it = wf.add_item(value,
+                             subtitle(conv, f),
                              valid=True,
                              arg=arg,
                              copytext=copytext,

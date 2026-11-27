@@ -30,12 +30,30 @@ C = convert.Conversion
 
 
 class FakeWorkflow:
-    """Just enough of `workflow.Workflow`: settings and cache in memory."""
+    """Just enough of `workflow.Workflow`: settings, cache and results."""
 
     def __init__(self, tmp_path=None):
         self.dir = tmp_path
         self.settings = {}
         self.saved = {}  # cache name -> time saved
+        self.items = []  # results shown in Alfred
+        self.age = 0  # of the cached exchange rates
+
+    def add_item(self, title, subtitle='', **kwargs):
+        self.items.append(dict(kwargs, title=title, subtitle=subtitle))
+        return self  # also stands in for the item
+
+    def add_modifier(self, *args, **kwargs):
+        return self
+
+    def setvar(self, name, value):
+        pass
+
+    def send_feedback(self):
+        pass
+
+    def cached_data_age(self, name):
+        return self.age
 
     def cachefile(self, name):
         return str(self.dir / name)
@@ -314,6 +332,34 @@ def test_currency_symbols(monkeypatch):
             ('5 $/lb €/kg', 'USD/pound', ['EUR/kilogram'])]:
         i = c.parse(query)
         assert (i.from_unit, i.to_units) == (from_unit, to_units)
+
+
+def show(query, monkeypatch, rates=None):
+    """Return the results Alfred would show for ``query``."""
+    wf = FakeWorkflow()
+    wf.age = 3 * 3600 + 600
+    monkeypatch.setattr(convert, 'wf', wf, raising=False)
+    for name, value in [('DECIMAL_PLACES', 2), ('CURRENCY_DECIMAL_PLACES', 2),
+                        ('DECIMAL_SEPARATOR', '.'),
+                        ('THOUSANDS_SEPARATOR', ','),
+                        ('DYNAMIC_DECIMALS', True), ('COPY_UNIT', False)]:
+        monkeypatch.setattr(convert, name, value)
+    if rates:
+        monkeypatch.setattr(convert, 'ureg', convert.UnitRegistry(
+            convert.DEFAULT_UNIT_DEFINITIONS))
+        convert.ureg.formatter.default_format = 'P'
+        convert.register_exchange_rates(rates)
+    convert.convert(query)
+    return wf.items
+
+
+def test_currency_subtitle(monkeypatch):
+    """Currency results show the rate, and how old the rates are."""
+    [item] = show('10 eur usd', monkeypatch, {'EUR': 0.5})
+    assert item['subtitle'] == (
+        '1 EUR = 2.00 USD · rates updated 3 hours 10 minutes ago')
+    [item] = show('10 km mi', monkeypatch)
+    assert item['subtitle'] == ''
 
 
 def test_currency_error_names_missing_key(monkeypatch):
