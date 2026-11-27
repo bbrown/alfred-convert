@@ -187,37 +187,14 @@ class Formatter(object):
         log.debug('places=%d', p)
         return p
 
-    def formatted(self, n, unit=None):
-        """Format number with thousands and decimal separators."""
-        sep = u''
-        if self.thousands_separator:
-            sep = u','
-
-        fmt = u'{{:0{}.{:d}f}}'.format(sep, self._decimal_places(n))
-        num = fmt.format(n)
-        # log.debug('n=%r, fmt=%r, num=%r', n, fmt, num)
-        num = num.replace(',', '||comma||')
-        num = num.replace('.', '||point||')
-        num = num.replace('||comma||', self.thousands_separator)
-        num = num.replace('||point||', self.decimal_separator)
-
-        if unit:
-            num = u'{} {}'.format(num, unit)
-
-        return num
-
-    def formatted_no_thousands(self, n, unit=None):
-        """Format number with decimal separator only."""
-        fmt = u'{{:0.{:d}f}}'.format(self._decimal_places(n))
-        num = fmt.format(n)
-        # log.debug('n=%r, fmt=%r, num=%r', n, fmt, num)
-        num = num.replace('.', '||point||')
-        num = num.replace('||point||', self.decimal_separator)
-
-        if unit:
-            num = u'{} {}'.format(num, unit)
-
-        return num
+    def formatted(self, n, unit=None, thousands=True):
+        """Format number with decimal and (optional) thousands separators."""
+        sep = ',' if thousands and self.thousands_separator else ''
+        num = '{:{}.{}f}'.format(n, sep, self._decimal_places(n))
+        # One pass, so swapping "," and "." (e.g. 1.234,50) works
+        num = num.translate({ord(','): self.thousands_separator,
+                             ord('.'): self.decimal_separator})
+        return '{} {}'.format(num, unit) if unit else num
 
 
 # Result of converting an `Input` to one unit
@@ -562,11 +539,10 @@ def convert(query):
                       DYNAMIC_DECIMALS)
         wf.setvar('query', query)
         for conv in results:
-            value = copytext = f.formatted(conv.to_number, conv.to_unit)
-            arg = f.formatted_no_thousands(conv.to_number, conv.to_unit)
-            if not COPY_UNIT:
-                copytext = f.formatted(conv.to_number)
-                arg = f.formatted_no_thousands(conv.to_number)
+            value = f.formatted(conv.to_number, conv.to_unit)
+            unit = conv.to_unit if COPY_UNIT else None
+            copytext = f.formatted(conv.to_number, unit)
+            arg = f.formatted(conv.to_number, unit, thousands=False)
 
             it = wf.add_item(value,
                              valid=True,

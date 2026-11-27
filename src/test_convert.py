@@ -133,6 +133,10 @@ def test_formatter():
     assert f.formatted(0.015) == '0.015'
     assert f.formatted(0.0046) == '0.0046'
 
+    f = convert.Formatter(2, ',', '.', dynamic_decimals=False)
+    assert f.formatted(1234.5, 'm') == '1.234,50 m'
+    assert f.formatted(1234.5, thousands=False) == '1234,50'
+
 
 def test_bad_currency_symbols_are_skipped(monkeypatch):
     """One bad exchange rate doesn't stop the others from loading."""
